@@ -1,0 +1,73 @@
+<html>
+<head>
+<title>EviteMenu.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #629755; font-style: italic;}
+.s3 { color: #629755; font-weight: bold; font-style: italic;}
+.s4 { color: #808080;}
+.s5 { color: #6a8759;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+EviteMenu.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">controller</span><span class="s0">;</span>
+
+<span class="s2">/**</span>
+ <span class="s2">* Class Description</span>
+ <span class="s2">*</span>
+ <span class="s2">* </span><span class="s3">@author </span><span class="s2">Twyla Zhang</span>
+ <span class="s2">* email: twylazha@usc.edu</span>
+ <span class="s2">* ITP 265, Spring 2023, boba section</span>
+ <span class="s2">* Date: 5/1/23</span>
+ <span class="s2">*/</span>
+
+<span class="s4">//referenced from the StoreMenu in A11</span>
+<span class="s0">public enum </span><span class="s1">EviteMenu {</span>
+    <span class="s1">LOGIN_CREATE(</span><span class="s5">&quot;User Login or create new account&quot;</span><span class="s1">)</span><span class="s0">,</span>
+    <span class="s1">LOG_OUT(</span><span class="s5">&quot;Log out&quot;</span><span class="s1">)</span><span class="s0">,</span>
+    <span class="s1">PLAN_EDIT_A_PARTY(</span><span class="s5">&quot;Plan or edit a party(need to upgrade)&quot;</span><span class="s1">)</span><span class="s0">,</span>
+    <span class="s1">RESERVE_A_PARTY(</span><span class="s5">&quot;Make reservation for a party&quot;</span><span class="s1">)</span><span class="s0">,</span>
+    <span class="s4">//ACCPET_INVITATIONS(&quot;Accept the invitations from a host&quot;),</span>
+    <span class="s4">//VIEW_EDIT_PARTY(&quot;View a party or edit it&quot;),</span>
+    <span class="s4">//INVITATIONS_INVITED(&quot;Check the invitations sent to guests or invitations received&quot;),</span>
+    <span class="s1">INVITE_GUEST(</span><span class="s5">&quot;Invite a guest to your party.&quot;</span><span class="s1">)</span><span class="s0">,</span>
+    <span class="s1">CHECK_PARTIES_PLANNED_GO(</span><span class="s5">&quot;Display parties that you plan to go&quot;</span><span class="s1">)</span><span class="s0">,</span>
+    <span class="s1">VIEW_ALL_PARTIES(</span><span class="s5">&quot;Display all the parties in the system&quot;</span><span class="s1">)</span><span class="s0">,</span>
+    <span class="s1">CHECK_ACCEPT_RESERVATIONS(</span><span class="s5">&quot;Check the reservations received from other users and decide if want to accept&quot;</span><span class="s1">)</span><span class="s0">,</span>
+    <span class="s1">UPGRADE(</span><span class="s5">&quot;Upgrade from a guest account to host account to plan a party.&quot;</span><span class="s1">)</span><span class="s0">,</span>
+    <span class="s1">EDIT_USER(</span><span class="s5">&quot;Make changes to the User's account&quot;</span><span class="s1">)</span><span class="s0">,</span>
+    <span class="s1">SAVE_DATA(</span><span class="s5">&quot;Save the all the data in the system to files.&quot;</span><span class="s1">)</span><span class="s0">,</span>
+    <span class="s1">QUIT(</span><span class="s5">&quot;Quit&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+    <span class="s0">private </span><span class="s1">String description</span><span class="s0">;</span>
+    <span class="s0">private </span><span class="s1">EviteMenu(String description){</span>
+        <span class="s0">this</span><span class="s1">.description = description</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public </span><span class="s1">String getDescription(){</span>
+        <span class="s0">return this</span><span class="s1">.description</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+    <span class="s4">//return the String that prints out the menu of the Evite System</span>
+    <span class="s0">public static </span><span class="s1">String getMenu() {</span>
+        <span class="s1">String prompt = </span><span class="s5">&quot;</span><span class="s0">\n</span><span class="s5">Welcome to Evite System!</span><span class="s0">\n</span><span class="s5">&quot;</span><span class="s0">;</span>
+        <span class="s0">for</span><span class="s1">(EviteMenu m : EviteMenu.values()){</span>
+            <span class="s1">prompt += </span><span class="s5">&quot;</span><span class="s0">\n</span><span class="s5">&quot; </span><span class="s1">+ (m.ordinal()) + </span><span class="s5">&quot;: &quot; </span><span class="s1">+ m.getDescription()</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s1">prompt+=</span><span class="s5">&quot;</span><span class="s0">\n</span><span class="s5">**********************************************</span><span class="s0">\n</span><span class="s5">&quot;</span><span class="s0">;</span>
+        <span class="s0">return </span><span class="s1">prompt</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+<span class="s1">}</span>
+</pre>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<html>
+<head>
+<title>Event.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #629755; font-style: italic;}
+.s3 { color: #629755; font-weight: bold; font-style: italic;}
+.s4 { color: #808080;}
+.s5 { color: #6897bb;}
+.s6 { color: #6a8759;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Event.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">model.party</span><span class="s0">;</span>
+<span class="s0">import <a href="../../model/people/User.java.html">model.people.User</a>;</span>
+<span class="s0">import </span><span class="s1">java.time.LocalDate</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.util.List</span><span class="s0">;</span>
+
+<span class="s2">/**</span>
+ <span class="s2">* Class Event</span>
+ <span class="s2">*</span>
+ <span class="s2">* </span><span class="s3">@author </span><span class="s2">Twyla Zhang</span>
+ <span class="s2">* email: twylazha@usc.edu</span>
+ <span class="s2">* ITP 265, Spring 2023, boba section</span>
+ <span class="s2">* Date: 4/29/23</span>
+ <span class="s2">*/</span>
+<span class="s0">public abstract class </span><span class="s1">Event </span><span class="s0">implements <a href="User_Party.java.html">User_Party</a></span><span class="s1">{</span>
+    <span class="s0">private </span><span class="s1">String name</span><span class="s0">;</span>
+    <span class="s0">private </span><span class="s1">String theme</span><span class="s0">;</span>
+    <span class="s4">//private EventType occasion;</span>
+    <span class="s0">private </span><span class="s1">List&lt;User&gt; guestList</span><span class="s0">;</span>
+    <span class="s0">private </span><span class="s1">String location</span><span class="s0">;</span>
+    <span class="s4">//private String menu;</span>
+    <span class="s0">private </span><span class="s1">LocalDate time</span><span class="s0">;</span>
+    <span class="s0">private boolean </span><span class="s1">ageLimit</span><span class="s0">;</span>
+    <span class="s0">private boolean </span><span class="s1">isOpen</span><span class="s0">;</span>
+    <span class="s0">private <a href="../../model/people/User.java.html">User</a> </span><span class="s1">host</span><span class="s0">;</span>
+    <span class="s0">private </span><span class="s1">List&lt;String&gt; guestList_Holder</span><span class="s0">;</span>
+
+
+    <span class="s4">//Constructors</span>
+    <span class="s0">public </span><span class="s1">Event(String name</span><span class="s0">, </span><span class="s1">String theme</span><span class="s0">, </span><span class="s1">List&lt;User&gt; guestList</span><span class="s0">, </span><span class="s1">String location</span><span class="s0">, </span><span class="s1">LocalDate time</span><span class="s0">, boolean </span><span class="s1">ageLimit</span><span class="s0">, boolean </span><span class="s1">isOpen) {</span>
+        <span class="s0">this</span><span class="s1">.name = name</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.theme = theme</span><span class="s0">;</span>
+        <span class="s4">//this.occasion = occasion;</span>
+        <span class="s0">this</span><span class="s1">.guestList = guestList</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.location = location</span><span class="s0">;</span>
+        <span class="s4">//this.menu = menu;</span>
+        <span class="s0">this</span><span class="s1">.time = time</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.ageLimit = ageLimit</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.isOpen = isOpen</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public </span><span class="s1">Event(String name</span><span class="s0">, </span><span class="s1">String theme</span><span class="s0">, </span><span class="s1">List&lt;User&gt; guestList</span><span class="s0">, </span><span class="s1">String location</span><span class="s0">, </span><span class="s1">LocalDate time){</span>
+        <span class="s0">this</span><span class="s1">(name</span><span class="s0">, </span><span class="s1">theme</span><span class="s0">, </span><span class="s1">guestList</span><span class="s0">, </span><span class="s1">location</span><span class="s0">, </span><span class="s1">time</span><span class="s0">, false, false</span><span class="s1">)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s4">//getters</span>
+    <span class="s0">public </span><span class="s1">String getName() {</span>
+        <span class="s0">return </span><span class="s1">name</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public </span><span class="s1">String getTheme() {</span>
+        <span class="s0">return </span><span class="s1">theme</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public boolean </span><span class="s1">isAgeLimit() {</span>
+        <span class="s0">return </span><span class="s1">ageLimit</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public <a href="../../model/people/User.java.html">User</a> </span><span class="s1">getHost() {</span><span class="s0">return </span><span class="s1">host</span><span class="s0">;</span><span class="s1">}</span>
+    <span class="s4">//public EventType getOccasion() {return occasion;}</span>
+
+    <span class="s0">public </span><span class="s1">List&lt;User&gt; getGuestList() {</span>
+        <span class="s0">return </span><span class="s1">guestList</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public </span><span class="s1">String getLocation() {</span>
+        <span class="s0">return </span><span class="s1">location</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s4">//public String getMenu() {return menu;}</span>
+
+    <span class="s0">public </span><span class="s1">LocalDate getTime() {</span>
+        <span class="s0">return </span><span class="s1">time</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public boolean </span><span class="s1">hasAgeLimit() {</span>
+        <span class="s0">return </span><span class="s1">ageLimit</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public boolean </span><span class="s1">isOpen() {</span>
+        <span class="s0">return </span><span class="s1">isOpen</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public </span><span class="s1">List&lt;String&gt; getGuestList_Holder() {</span><span class="s0">return </span><span class="s1">guestList_Holder</span><span class="s0">;</span><span class="s1">}</span>
+
+    <span class="s4">//setters</span>
+    <span class="s0">public void </span><span class="s1">setName(String name) {</span>
+        <span class="s0">this</span><span class="s1">.name = name</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public void </span><span class="s1">setTheme(String theme) {</span>
+        <span class="s0">this</span><span class="s1">.theme = theme</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public void </span><span class="s1">setHost(<a href="../../model/people/User.java.html">User</a> host) {</span><span class="s0">this</span><span class="s1">.host = host</span><span class="s0">;</span><span class="s1">}</span>
+
+<span class="s4">//public void setOccasion(EventType occasion) {this.occasion = occasion;}</span>
+
+    <span class="s0">public void </span><span class="s1">setGuestList(List&lt;User&gt; guestList) {</span><span class="s0">this</span><span class="s1">.guestList = guestList</span><span class="s0">;</span><span class="s1">}</span>
+
+    <span class="s0">public void </span><span class="s1">setLocation(String location) {</span>
+        <span class="s0">this</span><span class="s1">.location = location</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s4">//public void setMenu(String menu) {this.menu = menu;}</span>
+
+    <span class="s0">public void </span><span class="s1">setTime(LocalDate time) {</span>
+        <span class="s0">this</span><span class="s1">.time = time</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public void </span><span class="s1">setAgeLimit(</span><span class="s0">boolean </span><span class="s1">ageLimit) {</span>
+        <span class="s0">this</span><span class="s1">.ageLimit = ageLimit</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public void </span><span class="s1">setOpen(</span><span class="s0">boolean </span><span class="s1">open) {</span>
+        <span class="s1">isOpen = open</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public void </span><span class="s1">setGuestList_Holder(List&lt;String&gt; guestList_Holder) {</span><span class="s0">this</span><span class="s1">.guestList_Holder = guestList_Holder</span><span class="s0">;</span><span class="s1">}</span>
+
+    <span class="s4">//equals and toString</span>
+    <span class="s1">@Override</span>
+    <span class="s0">public boolean </span><span class="s1">equals(Object o) {</span>
+        <span class="s0">if </span><span class="s1">(</span><span class="s0">this </span><span class="s1">== o) </span><span class="s0">return true;</span>
+        <span class="s0">if </span><span class="s1">(o == </span><span class="s0">null </span><span class="s1">|| getClass() != o.getClass()) </span><span class="s0">return false;</span>
+
+        <span class="s1">Event event = (Event) o</span><span class="s0">;</span>
+
+        <span class="s0">if </span><span class="s1">(ageLimit != event.ageLimit) </span><span class="s0">return false;</span>
+        <span class="s0">if </span><span class="s1">(isOpen != event.isOpen) </span><span class="s0">return false;</span>
+        <span class="s0">if </span><span class="s1">(!name.equals(event.name)) </span><span class="s0">return false;</span>
+        <span class="s0">if </span><span class="s1">(!theme.equals(event.theme)) </span><span class="s0">return false;</span>
+        <span class="s4">//if (occasion != event.occasion) return false;</span>
+        <span class="s0">if </span><span class="s1">(!guestList.equals(event.guestList)) </span><span class="s0">return false;</span>
+        <span class="s0">if </span><span class="s1">(!location.equals(event.location)) </span><span class="s0">return false;</span>
+        <span class="s4">//if (!menu.equals(event.menu)) return false;</span>
+        <span class="s0">return </span><span class="s1">time.equals(event.time)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public int </span><span class="s1">hashCode() {</span>
+        <span class="s0">int </span><span class="s1">result = name.hashCode()</span><span class="s0">;</span>
+        <span class="s1">result = </span><span class="s5">31 </span><span class="s1">* result + theme.hashCode()</span><span class="s0">;</span>
+       <span class="s4">// result = 31 * result + occasion.hashCode();</span>
+        <span class="s1">result = </span><span class="s5">31 </span><span class="s1">* result + guestList.hashCode()</span><span class="s0">;</span>
+        <span class="s1">result = </span><span class="s5">31 </span><span class="s1">* result + location.hashCode()</span><span class="s0">;</span>
+        <span class="s4">//result = 31 * result + menu.hashCode();</span>
+        <span class="s1">result = </span><span class="s5">31 </span><span class="s1">* result + time.hashCode()</span><span class="s0">;</span>
+        <span class="s1">result = </span><span class="s5">31 </span><span class="s1">* result + (ageLimit ? </span><span class="s5">1 </span><span class="s1">: </span><span class="s5">0</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">result = </span><span class="s5">31 </span><span class="s1">* result + (isOpen ? </span><span class="s5">1 </span><span class="s1">: </span><span class="s5">0</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">return </span><span class="s1">result</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public </span><span class="s1">String toString() {</span>
+        <span class="s0">return   </span><span class="s6">&quot;On &quot; </span><span class="s1">+ time + </span><span class="s6">&quot;, this party named &quot; </span><span class="s1">+ name +</span>
+                <span class="s6">&quot; with theme &quot; </span><span class="s1">+ theme +</span>
+                <span class="s6">&quot; is at &quot; </span><span class="s1">+ location + </span><span class="s6">'</span><span class="s0">\'</span><span class="s6">' </span><span class="s1">+</span>
+                <span class="s6">&quot;, status: [ageLimit= &quot; </span><span class="s1">+ ageLimit +</span>
+                <span class="s6">&quot;, open to everyone=&quot; </span><span class="s1">+ isOpen + </span><span class="s6">&quot; ].&quot;</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public </span><span class="s1">String fullStatus() {</span>
+        <span class="s1">String guests = </span><span class="s6">&quot;&quot;</span><span class="s0">;</span>
+        <span class="s0">for</span><span class="s1">(<a href="../../model/people/User.java.html">User</a> u:guestList){</span>
+            <span class="s1">guests += </span><span class="s6">&quot; &quot; </span><span class="s1">+ u.getName()</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">return </span><span class="s6">&quot;Event{&quot; </span><span class="s1">+</span>
+                <span class="s6">&quot;name='&quot; </span><span class="s1">+ name + </span><span class="s6">'</span><span class="s0">\'</span><span class="s6">' </span><span class="s1">+</span>
+                <span class="s6">&quot;, theme='&quot; </span><span class="s1">+ theme + </span><span class="s6">'</span><span class="s0">\'</span><span class="s6">' </span><span class="s1">+</span>
+                <span class="s6">&quot;, guestList=&quot; </span><span class="s1">+ guests +</span>
+                <span class="s6">&quot;, location='&quot; </span><span class="s1">+ location + </span><span class="s6">'</span><span class="s0">\'</span><span class="s6">' </span><span class="s1">+</span>
+                <span class="s4">//&quot;, menu='&quot; + menu + '\'' +</span>
+                <span class="s6">&quot;, time=&quot; </span><span class="s1">+ time +</span>
+                <span class="s6">&quot;, ageLimit=&quot; </span><span class="s1">+ ageLimit +</span>
+                <span class="s6">&quot;, isOpen=&quot; </span><span class="s1">+ isOpen +</span>
+                <span class="s6">'}'</span><span class="s0">;</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+</pre>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<html>
+<head>
+<title>Host.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #629755; font-style: italic;}
+.s3 { color: #629755; font-weight: bold; font-style: italic;}
+.s4 { color: #808080;}
+.s5 { color: #6a8759;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Host.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">model.people</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">model.party.*</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">java.util.ArrayList</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.util.HashMap</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.util.List</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.util.Map</span><span class="s0">;</span>
+
+<span class="s2">/**</span>
+ <span class="s2">* Class Description</span>
+ <span class="s2">*</span>
+ <span class="s2">* </span><span class="s3">@author </span><span class="s2">Twyla Zhang</span>
+ <span class="s2">* email: twylazha@usc.edu</span>
+ <span class="s2">* ITP 265, Spring 2023, boba section</span>
+ <span class="s2">* Date: 4/29/23</span>
+ <span class="s2">*/</span>
+<span class="s0">public class </span><span class="s1">Host </span><span class="s0">extends <a href="Guest.java.html">Guest</a> implements <a href="../../model/party/Gift.java.html">Gift</a></span><span class="s1">{</span>
+    <span class="s0">private </span><span class="s1">List&lt;Event&gt; partyHosting</span><span class="s0">;</span>
+    <span class="s0">private </span><span class="s1">List&lt;String&gt; partyHosting_holder</span><span class="s0">;</span>
+
+
+    <span class="s4">//map of guests that are  invited but have not accepted the invitation from host</span>
+    <span class="s4">//private Map&lt;User, Event&gt; pendingGuests;</span>
+
+
+    <span class="s4">//map of guests who need approval from the host to attend the party</span>
+    <span class="s0">private </span><span class="s1">Map&lt;User</span><span class="s0">, </span><span class="s1">Event&gt; needApprovalGuests</span><span class="s0">;</span>
+
+
+
+    <span class="s0">public </span><span class="s1">Host(String name</span><span class="s0">, </span><span class="s1">String email</span><span class="s0">, </span><span class="s1">String password</span><span class="s0">, </span><span class="s1">Map&lt;User</span><span class="s0">, </span><span class="s1">Event&gt; invited</span><span class="s0">, </span><span class="s1">Map&lt;User</span><span class="s0">, </span><span class="s1">Event&gt; reservation</span><span class="s0">, </span><span class="s1">String gift</span><span class="s0">, </span><span class="s1">List&lt;User&gt; fakeAccounts</span><span class="s0">, </span><span class="s1">List&lt;Event&gt; partyHosting</span><span class="s0">, </span><span class="s1">Map&lt;User</span><span class="s0">, </span><span class="s1">Event&gt; needApprovalGuests) {</span>
+        <span class="s0">super</span><span class="s1">(name</span><span class="s0">, </span><span class="s1">email</span><span class="s0">, </span><span class="s1">password</span><span class="s0">, </span><span class="s1">invited</span><span class="s0">, </span><span class="s1">reservation</span><span class="s0">, </span><span class="s1">gift</span><span class="s0">, </span><span class="s1">fakeAccounts)</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.partyHosting = partyHosting</span><span class="s0">;</span>
+        <span class="s4">//this.pendingGuests = pendingGuests;</span>
+        <span class="s0">this</span><span class="s1">.needApprovalGuests = needApprovalGuests</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+    <span class="s0">public </span><span class="s1">Host(String name</span><span class="s0">, </span><span class="s1">String email</span><span class="s0">, </span><span class="s1">String password) {</span>
+        <span class="s0">this</span><span class="s1">(name</span><span class="s0">, </span><span class="s1">email</span><span class="s0">, </span><span class="s1">password</span><span class="s0">, new </span><span class="s1">HashMap&lt;&gt;()</span><span class="s0">, new </span><span class="s1">HashMap&lt;&gt;()</span><span class="s0">, </span><span class="s5">&quot;gift&quot;</span><span class="s0">, new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">,new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">,new </span><span class="s1">HashMap&lt;&gt;())</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+    <span class="s4">//getters</span>
+    <span class="s0">public </span><span class="s1">List&lt;Event&gt; getPartyHosting() {</span>
+        <span class="s0">return </span><span class="s1">partyHosting</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s4">//public Map&lt;User, Event&gt;  getPendingGuests() {return pendingGuests;}</span>
+
+    <span class="s0">public </span><span class="s1">Map&lt;User</span><span class="s0">, </span><span class="s1">Event&gt; getNeedApprovalGuests() {</span>
+        <span class="s0">return </span><span class="s1">needApprovalGuests</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public </span><span class="s1">List&lt;String&gt; getPartyHosting_holder() {</span>
+        <span class="s0">return </span><span class="s1">partyHosting_holder</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s4">//setters</span>
+    <span class="s0">public void </span><span class="s1">setPartyHosting(List&lt;Event&gt; partyHosting) {</span>
+        <span class="s0">this</span><span class="s1">.partyHosting = partyHosting</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s4">//public void setPendingGuests(Map&lt;User, Event&gt;  pendingGuests) {this.pendingGuests = pendingGuests;}</span>
+
+    <span class="s0">public void </span><span class="s1">setNeedApprovalGuests(Map&lt;User</span><span class="s0">, </span><span class="s1">Event&gt; needApprovalGuests) {</span>
+        <span class="s0">this</span><span class="s1">.needApprovalGuests = needApprovalGuests</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public void </span><span class="s1">setPartyHosting_holder(List&lt;String&gt; partyHosting_holder) {</span>
+        <span class="s0">this</span><span class="s1">.partyHosting_holder = partyHosting_holder</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s4">//remove the guest from the guest list</span>
+    <span class="s0">public boolean </span><span class="s1">removeGuest(<a href="User.java.html">User</a> u</span><span class="s0">, <a href="../../model/party/Event.java.html">Event</a> </span><span class="s1">e){</span>
+        <span class="s0">boolean </span><span class="s1">removed = </span><span class="s0">false;</span>
+        <span class="s0">if </span><span class="s1">(e.getGuestList().remove(u)){</span>
+            <span class="s1">removed = </span><span class="s0">true;</span>
+        <span class="s1">}</span>
+
+        <span class="s0">return </span><span class="s1">removed</span><span class="s0">;</span>
+    <span class="s1">}</span>
+<span class="s4">/* 
+    //check the pending guest list and whether the guests accept the invitation 
+    public void check_pending() { 
+        System.out.println(&quot;Here are the guests who have not accepted the invitation&quot;); 
+            for(var pair: getPendingGuests().entrySet()){ 
+                User guest = pair.getKey(); 
+                Event party = pair.getValue(); 
+                System.out.println(&quot;You invited &quot; + guest.getName() + &quot; to &quot; + party.getName()); 
+            } 
+    } 
+ 
+ */</span>
+
+    <span class="s0">public void </span><span class="s1">addNeedApprovalGuests(<a href="User.java.html">User</a> u</span><span class="s0">, <a href="../../model/party/Event.java.html">Event</a> </span><span class="s1">p){</span>
+        <span class="s1">needApprovalGuests.put(u</span><span class="s0">,</span><span class="s1">p)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+    <span class="s4">//let the host check the reservations received</span>
+    <span class="s0">public void </span><span class="s1">reservations_received() {</span>
+        <span class="s1">System.out.println(</span><span class="s5">&quot;Here are the guests who want to reserve a party that you are hosting&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">System.out.println(getNeedApprovalGuests())</span><span class="s0">;</span>
+        <span class="s0">for</span><span class="s1">(var pair: getNeedApprovalGuests().entrySet()){</span>
+            <a href="User.java.html">User</a> <span class="s1">guest = pair.getKey()</span><span class="s0">;</span>
+            <a href="../../model/party/Event.java.html">Event</a> <span class="s1">party = pair.getValue()</span><span class="s0">;</span>
+            <span class="s1">System.out.println(</span><span class="s5">&quot;Guest &quot; </span><span class="s1">+ guest.getName() + </span><span class="s5">&quot; wants to join &quot; </span><span class="s1">+ party.getName())</span><span class="s0">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+    <span class="s4">//collect and returns the gifts brought by all the guests</span>
+    <span class="s1">@Override</span>
+    <span class="s0">public </span><span class="s1">Map&lt;User</span><span class="s0">, </span><span class="s1">String&gt; collectGift(List&lt;User&gt; allGuests) {</span>
+        <span class="s1">Map&lt;User</span><span class="s0">, </span><span class="s1">String&gt; giftMap = </span><span class="s0">new </span><span class="s1">HashMap&lt;&gt;()</span><span class="s0">;</span>
+        <span class="s0">for </span><span class="s1">(<a href="User.java.html">User</a> u: allGuests){</span>
+            <span class="s0">if </span><span class="s1">(u </span><span class="s0">instanceof <a href="Guest.java.html">Guest</a></span><span class="s1">){</span>
+                <span class="s1">giftMap.put(u</span><span class="s0">, </span><span class="s1">((<a href="Guest.java.html">Guest</a>) u).getGift())</span><span class="s0">;</span>
+            <span class="s1">}</span>
+
+        <span class="s1">}</span>
+        <span class="s0">return </span><span class="s1">giftMap</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public </span><span class="s1">String toString() {</span>
+        <span class="s0">return </span><span class="s5">&quot;Host name is &quot; </span><span class="s1">+ </span><span class="s0">super</span><span class="s1">.getName() +</span>
+                <span class="s5">&quot; who is hosting &quot; </span><span class="s1">+ partyHosting.size() + </span><span class="s5">&quot; parties.&quot;</span><span class="s0">;</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+</pre>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<html>
+<head>
+<title>User.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #629755; font-style: italic;}
+.s3 { color: #629755; font-weight: bold; font-style: italic;}
+.s4 { color: #808080;}
+.s5 { color: #6a8759;}
+.s6 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+User.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">model.people</span><span class="s0">;</span>
+
+<span class="s0">import <a href="../../model/party/User_Party.java.html">model.party.User_Party</a>;</span>
+
+<span class="s2">/**</span>
+ <span class="s2">* Class Description</span>
+ <span class="s2">*</span>
+ <span class="s2">* </span><span class="s3">@author </span><span class="s2">Twyla Zhang</span>
+ <span class="s2">* email: twylazha@usc.edu</span>
+ <span class="s2">* ITP 265, Spring 2023, boba section</span>
+ <span class="s2">* Date: 4/29/23</span>
+ <span class="s2">*/</span>
+<span class="s0">public class </span><span class="s1">User </span><span class="s0">implements <a href="../../model/party/User_Party.java.html">User_Party</a> </span><span class="s1">{</span>
+    <span class="s0">private </span><span class="s1">String name</span><span class="s0">;</span>
+    <span class="s0">private </span><span class="s1">String email</span><span class="s0">;</span>
+    <span class="s0">private </span><span class="s1">String password</span><span class="s0">;</span>
+
+
+    <span class="s0">public </span><span class="s1">User(String name</span><span class="s0">, </span><span class="s1">String email</span><span class="s0">, </span><span class="s1">String password) {</span>
+        <span class="s0">this</span><span class="s1">.name = name</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.email = email</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.password = password</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s4">//Constructor for creating a fake account</span>
+    <span class="s0">public </span><span class="s1">User(String name) {</span>
+        <span class="s0">this</span><span class="s1">(name</span><span class="s0">, </span><span class="s5">&quot;fakeAccount&quot;</span><span class="s0">, </span><span class="s5">&quot;fakeAccount&quot;</span><span class="s1">)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s4">//getters</span>
+    <span class="s0">public </span><span class="s1">String getName() {</span>
+        <span class="s0">return </span><span class="s1">name</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public </span><span class="s1">String getEmail() {</span>
+        <span class="s0">return </span><span class="s1">email</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public </span><span class="s1">String getPassword() {</span>
+        <span class="s0">return </span><span class="s1">password</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s4">//setters</span>
+    <span class="s0">public void </span><span class="s1">setName(String name) {</span>
+        <span class="s0">this</span><span class="s1">.name = name</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public void </span><span class="s1">setEmail(String email) {</span>
+        <span class="s0">this</span><span class="s1">.email = email</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public void </span><span class="s1">setPassword(String password) {</span>
+        <span class="s0">this</span><span class="s1">.password = password</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+    <span class="s4">//equals method</span>
+    <span class="s1">@Override</span>
+    <span class="s0">public boolean </span><span class="s1">equals(Object o) {</span>
+        <span class="s0">if </span><span class="s1">(</span><span class="s0">this </span><span class="s1">== o) </span><span class="s0">return true;</span>
+        <span class="s0">if </span><span class="s1">(o == </span><span class="s0">null </span><span class="s1">|| getClass() != o.getClass()) </span><span class="s0">return false;</span>
+
+        <span class="s1">User user = (User) o</span><span class="s0">;</span>
+
+        <span class="s0">if </span><span class="s1">(!name.equals(user.name)) </span><span class="s0">return false;</span>
+        <span class="s0">if </span><span class="s1">(!email.equals(user.email)) </span><span class="s0">return false;</span>
+        <span class="s0">return </span><span class="s1">password.equals(user.password)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s1">@Override</span>
+    <span class="s0">public int </span><span class="s1">hashCode() {</span>
+        <span class="s0">int </span><span class="s1">result = name.hashCode()</span><span class="s0">;</span>
+        <span class="s1">result = </span><span class="s6">31 </span><span class="s1">* result + email.hashCode()</span><span class="s0">;</span>
+        <span class="s1">result = </span><span class="s6">31 </span><span class="s1">* result + password.hashCode()</span><span class="s0">;</span>
+        <span class="s0">return </span><span class="s1">result</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+
+    <span class="s4">//toString</span>
+    <span class="s1">@Override</span>
+    <span class="s0">public </span><span class="s1">String toString() {</span>
+        <span class="s0">return </span><span class="s5">&quot; name is &quot; </span><span class="s1">+ name + </span><span class="s5">&quot; with email &quot; </span><span class="s1">+ email</span><span class="s0">;</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+</pre>
+</body>
+</html>

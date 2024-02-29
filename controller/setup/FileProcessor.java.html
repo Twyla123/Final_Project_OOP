@@ -1,0 +1,450 @@
+<html>
+<head>
+<title>FileProcessor.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #629755; font-style: italic;}
+.s3 { color: #629755; font-weight: bold; font-style: italic;}
+.s4 { color: #6a8759;}
+.s5 { color: #808080;}
+.s6 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+FileProcessor.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">controller.setup</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">model.party.*</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">model.people.*</span><span class="s0">;</span>
+
+<span class="s0">import </span><span class="s1">java.io.FileInputStream</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.io.FileOutputStream</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.io.FileNotFoundException</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.io.IOException</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.time.LocalDate</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.util.*</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.io.PrintWriter</span><span class="s0">;</span>
+
+<span class="s2">/**</span>
+ <span class="s2">* Class Description</span>
+ <span class="s2">*</span>
+ <span class="s2">* </span><span class="s3">@author </span><span class="s2">Twyla Zhang</span>
+ <span class="s2">* email: twylazha@usc.edu</span>
+ <span class="s2">* ITP 265, Spring 2023, boba section</span>
+ <span class="s2">* Date: 5/4/23</span>
+ <span class="s2">*/</span>
+<span class="s0">public class </span><span class="s1">FileProcessor {</span>
+    <span class="s0">private static final </span><span class="s1">String PARTY_FILE = </span><span class="s4">&quot;/Users/twylazhang/IdeaProjects/codeItp265/Final_Project/src/controller/setup/party.csv&quot;</span><span class="s0">;</span>
+    <span class="s0">private static final </span><span class="s1">String USER_FILE = </span><span class="s4">&quot;/Users/twylazhang/IdeaProjects/codeItp265/Final_Project/src/controller/setup/user.csv&quot;</span><span class="s0">;</span>
+
+    <span class="s0">private static final </span><span class="s1">List&lt;Event&gt; ALLPARTY = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">;</span>
+    <span class="s0">private static final </span><span class="s1">List&lt;User&gt; ALLUSER = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">;</span>
+
+
+    <span class="s0">public static void </span><span class="s1">main(String[] args) {</span>
+        <span class="s5">//testing the map</span>
+        <span class="s1">readFile_all()</span><span class="s0">;</span>
+        <span class="s5">//System.out.println(&quot;Testing the Party: &quot; );</span>
+        <span class="s0">int </span><span class="s1">size = ALLPARTY.size()</span><span class="s0">;</span>
+        <span class="s1">System.out.println(</span><span class="s4">&quot;There are &quot; </span><span class="s1">+ size + </span><span class="s4">&quot; entries in the Party&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">for</span><span class="s1">(<a href="../../model/party/Event.java.html">Event</a> p: ALLPARTY){</span>
+            <span class="s1">System.out.println(p)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s1">System.out.println(</span><span class="s4">&quot;Testing the User: &quot; </span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">int </span><span class="s1">size2 = ALLUSER.size()</span><span class="s0">;</span>
+        <span class="s1">System.out.println(</span><span class="s4">&quot;There are &quot; </span><span class="s1">+ size2 + </span><span class="s4">&quot; entries in the User&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">for</span><span class="s1">(<a href="../../model/people/User.java.html">User</a> e: ALLUSER){</span>
+            <span class="s1">System.out.println(e)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+
+        <span class="s1">writePartyToFile(</span><span class="s4">&quot;twylaparty&quot;</span><span class="s0">, </span><span class="s1">ALLPARTY)</span><span class="s0">;</span>
+        <span class="s1">writeUserToFile(</span><span class="s4">&quot;twylauser&quot;</span><span class="s0">, </span><span class="s1">ALLUSER)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s5">//read the file step by step, first reads file and parse simple data, then parse more</span>
+    <span class="s0">public static </span><span class="s1">Map&lt;String</span><span class="s0">, </span><span class="s1">List&lt;User_Party&gt;&gt; readFile_all() {</span>
+        <span class="s1">Map&lt;String</span><span class="s0">, </span><span class="s1">List&lt;User_Party&gt;&gt; allData = </span><span class="s0">new </span><span class="s1">HashMap&lt;&gt;()</span><span class="s0">;</span>
+        <span class="s1">List&lt;User_Party&gt; user = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">;</span>
+        <span class="s1">List&lt;User_Party&gt; event = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">;</span>
+        <span class="s1">allData.put(</span><span class="s4">&quot;User&quot;</span><span class="s0">,  </span><span class="s1">readFile_1_User(USER_FILE</span><span class="s0">, </span><span class="s1">user))</span><span class="s0">;</span>
+        <span class="s1">allData.put(</span><span class="s4">&quot;Party&quot;</span><span class="s0">,  </span><span class="s1">readFile_1_Party(PARTY_FILE</span><span class="s0">, </span><span class="s1">event))</span><span class="s0">;</span>
+
+        <span class="s5">//must call this first, fulfill the partyHosting for Host, and set Host for each party</span>
+        <span class="s1">match_replace_partyHosting()</span><span class="s0">;</span>
+        <span class="s5">//fill out the GuestList for each party and invited map for guest</span>
+        <span class="s1">match_replace_party()</span><span class="s0">;</span>
+        <span class="s5">//fill out the pendingGuest</span>
+        <span class="s5">//fill_pendingGuest();</span>
+        <span class="s0">return </span><span class="s1">allData</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s5">//find the corresponding user in the ALLUSER and replace the uer holder in GuestList with the real user, and update guest's schedule</span>
+    <span class="s0">private static void </span><span class="s1">match_replace_party() {</span>
+        <span class="s0">for</span><span class="s1">(<a href="../../model/party/Event.java.html">Event</a> party: ALLPARTY) {</span>
+            <span class="s0">for</span><span class="s1">(String guest_name:party.getGuestList_Holder()){</span>
+                <span class="s0">for</span><span class="s1">(<a href="../../model/people/User.java.html">User</a> u: ALLUSER){</span>
+                    <span class="s0">if </span><span class="s1">(guest_name.equals(u.getName())){</span>
+                        <span class="s5">//replace the User holder with real user</span>
+                        <span class="s0">if </span><span class="s1">(party.getGuestList().contains(u)){</span>
+
+                        <span class="s1">}</span><span class="s0">else</span><span class="s1">{</span>
+                            <span class="s1">party.getGuestList().add(u)</span><span class="s0">;</span>
+                            <span class="s1">((<a href="../../model/people/Guest.java.html">Guest</a>) u).getPartyPlanned().put(party.getHost()</span><span class="s0">,</span><span class="s1">party)</span><span class="s0">;</span>
+                        <span class="s1">}</span>
+
+
+                        <span class="s5">/* 
+                        //fulfill the invited map for the guest 
+                        if (u instanceof Guest){ 
+                            ((Guest) u).getInvited().put(party.getHost(),party); 
+                        } 
+                         */</span>
+                    <span class="s1">}</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+
+    <span class="s5">//match and replace data for partyHosting. Using the name to find the corresponding party in ALLPARTY and put that into the PartyHosting for Host</span>
+    <span class="s0">private static void </span><span class="s1">match_replace_partyHosting() {</span>
+        <span class="s0">for</span><span class="s1">(<a href="../../model/people/User.java.html">User</a> u: ALLUSER){</span>
+                <span class="s0">if </span><span class="s1">(u </span><span class="s0">instanceof <a href="../../model/people/Host.java.html">Host</a></span><span class="s1">){</span>
+                    <span class="s0">for</span><span class="s1">(String party_name:((<a href="../../model/people/Host.java.html">Host</a>) u).getPartyHosting_holder()){</span>
+                        <span class="s0">for</span><span class="s1">(<a href="../../model/party/Event.java.html">Event</a> party: ALLPARTY){</span>
+                            <span class="s0">if</span><span class="s1">(party.getName().equals(party_name)){</span>
+                                <span class="s0">if</span><span class="s1">(((<a href="../../model/people/Host.java.html">Host</a>) u).getPartyHosting().contains(party)){</span>
+
+                                <span class="s1">}</span><span class="s0">else</span><span class="s1">{</span>
+                                    <span class="s1">((<a href="../../model/people/Host.java.html">Host</a>) u).getPartyHosting().add(party)</span><span class="s0">;   </span><span class="s5">//add the party to Host's PartyHosting</span>
+                                    <span class="s1">party.setHost(u)</span><span class="s0">;    </span><span class="s5">//setting the host for each party</span>
+                                <span class="s1">}</span>
+                            <span class="s1">}</span>
+                        <span class="s1">}</span>
+                    <span class="s1">}</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+    <span class="s1">}</span>
+
+
+    <span class="s5">//reads the file for both User and Party, parse the simple data, such as lists, String, boolean, then parse map</span>
+    <span class="s5">//referenced from A11 StoreFactory</span>
+    <span class="s0">private static </span><span class="s1">List&lt;User_Party&gt; readFile_1_Party(String file</span><span class="s0">, </span><span class="s1">List&lt;User_Party&gt; allParty) {</span>
+        <span class="s0">try</span><span class="s1">(FileInputStream fis = </span><span class="s0">new </span><span class="s1">FileInputStream(file)</span><span class="s0">;</span>
+            <span class="s1">Scanner scan = </span><span class="s0">new </span><span class="s1">Scanner(fis))</span>
+        <span class="s1">{</span>
+            <span class="s0">if </span><span class="s1">(scan.hasNext()) {</span>
+                <span class="s1">String header = scan.nextLine()</span><span class="s0">;  </span><span class="s5">//catch the header section</span>
+                <span class="s0">while </span><span class="s1">(scan.hasNextLine()) {</span>
+                    <span class="s1">String line = scan.nextLine()</span><span class="s0">;</span>
+                        <a href="../../model/party/Event.java.html">Event</a> <span class="s1">p = parseParty(line)</span><span class="s0">;</span>
+                        <span class="s0">if </span><span class="s1">(p != </span><span class="s0">null</span><span class="s1">) {</span>
+                            <span class="s1">ALLPARTY.add(p)</span><span class="s0">;</span>
+                            <span class="s1">allParty.add(p)</span><span class="s0">;</span>
+                        <span class="s1">}</span>
+                    <span class="s1">}</span>
+                <span class="s1">}</span>
+            <span class="s0">else </span><span class="s1">{</span>
+                <span class="s1">System.err.println(</span><span class="s4">&quot;File was empty: &quot; </span><span class="s1">+ file)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+
+        <span class="s1">}</span>
+        <span class="s0">catch </span><span class="s1">(FileNotFoundException e) {</span>
+            <span class="s1">System.err.println(</span><span class="s4">&quot;File not found: &quot; </span><span class="s1">+ file)</span><span class="s0">;</span>
+            <span class="s1">e.printStackTrace()</span><span class="s0">;</span>
+        <span class="s1">} </span><span class="s0">catch </span><span class="s1">(IOException e1) {e1.printStackTrace()</span><span class="s0">;</span><span class="s1">}</span>
+        <span class="s0">return </span><span class="s1">allParty</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+
+
+
+    <span class="s0">private static </span><span class="s1">List&lt;User_Party&gt; readFile_1_User(String file</span><span class="s0">, </span><span class="s1">List&lt;User_Party&gt; allUser) {</span>
+        <span class="s0">try</span><span class="s1">(FileInputStream fis = </span><span class="s0">new </span><span class="s1">FileInputStream(file)</span><span class="s0">;</span>
+            <span class="s1">Scanner scan = </span><span class="s0">new </span><span class="s1">Scanner(fis))</span>
+        <span class="s1">{</span>
+            <span class="s0">if </span><span class="s1">(scan.hasNext()) {</span>
+                <span class="s1">String header = scan.nextLine()</span><span class="s0">;  </span><span class="s5">//catch the header section</span>
+                <span class="s0">while</span><span class="s1">(scan.hasNextLine()) {</span>
+                    <span class="s1">String line = scan.nextLine()</span><span class="s0">;</span>
+                    <a href="../../model/people/User.java.html">User</a> <span class="s1">u = parseUser(line)</span><span class="s0">;</span>
+                    <span class="s0">if</span><span class="s1">(u != </span><span class="s0">null</span><span class="s1">) {</span>
+                        <span class="s1">allUser.add(u)</span><span class="s0">;</span>
+                        <span class="s1">ALLUSER.add(u)</span><span class="s0">;</span>
+                    <span class="s1">}</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+            <span class="s0">else </span><span class="s1">{System.err.println(</span><span class="s4">&quot;File was empty: &quot; </span><span class="s1">+ file)</span><span class="s0">;</span><span class="s1">}</span>
+        <span class="s1">}</span>
+        <span class="s0">catch </span><span class="s1">(FileNotFoundException e) {</span>
+            <span class="s1">System.err.println(</span><span class="s4">&quot;File not found: &quot; </span><span class="s1">+ file)</span><span class="s0">;</span>
+            <span class="s1">e.printStackTrace()</span><span class="s0">;</span>
+        <span class="s1">} </span><span class="s0">catch </span><span class="s1">(IOException e1) {</span>
+            <span class="s1">e1.printStackTrace()</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">return </span><span class="s1">allUser</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+
+
+
+    <span class="s5">//parse one line of the CSV file into one Event object, referenced from the A11 StoreFactory</span>
+    <span class="s0">private static <a href="../../model/party/Event.java.html">Event</a> </span><span class="s1">parseParty(String line) {</span>
+        <span class="s5">//party_type,name,theme,guestList,location,menu,time,age limit,isopen,</span>
+        <a href="../../model/party/Event.java.html">Event</a> <span class="s1">party = </span><span class="s0">null;</span>
+        <span class="s0">try </span><span class="s1">{</span>
+            <span class="s1">Scanner sc = </span><span class="s0">new </span><span class="s1">Scanner(line)</span><span class="s0">;</span>
+            <span class="s1">sc.useDelimiter(</span><span class="s4">&quot;,&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">String party_type = sc.next()</span><span class="s0">;</span>
+            <span class="s1">String name = sc.next()</span><span class="s0">;</span>
+            <span class="s1">String theme = sc.next()</span><span class="s0">;</span>
+            <span class="s1">List&lt;String&gt; guestList = parseGuest(sc.next())</span><span class="s0">;</span>
+            <span class="s1">String location = sc.next()</span><span class="s0">;</span>
+            <span class="s1">LocalDate time = parseTime(sc.next())</span><span class="s0">;</span>
+            <span class="s0">boolean </span><span class="s1">age_limit = sc.nextBoolean()</span><span class="s0">;</span>
+            <span class="s0">boolean </span><span class="s1">isOpen = sc.nextBoolean()</span><span class="s0">;</span>
+            <span class="s5">//Type,Year,MemoryShowcase,Limit,Registry,gradAnnouncement,guestList</span>
+            <span class="s1">String type = sc.next()</span><span class="s0">;</span>
+            <span class="s0">if</span><span class="s1">(party_type.equalsIgnoreCase(</span><span class="s4">&quot;Anniversary&quot;</span><span class="s1">)) {</span>
+                <span class="s0">int </span><span class="s1">year = sc.nextInt()</span><span class="s0">;</span>
+                <span class="s0">boolean </span><span class="s1">MemoryShowcase = sc.nextBoolean()</span><span class="s0">;</span>
+                <span class="s1">party = </span><span class="s0">new <a href="../../model/party/Anniversary.java.html">Anniversary</a></span><span class="s1">(name</span><span class="s0">, </span><span class="s1">theme</span><span class="s0">, new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">,</span><span class="s1">location</span><span class="s0">,</span><span class="s1">time</span><span class="s0">,</span><span class="s1">age_limit</span><span class="s0">,</span><span class="s1">isOpen</span><span class="s0">, </span><span class="s1">type</span><span class="s0">, </span><span class="s1">year</span><span class="s0">, </span><span class="s1">MemoryShowcase)</span><span class="s0">;</span>
+                <span class="s1">party.setGuestList_Holder(guestList)</span><span class="s0">;</span><span class="s1">}</span>
+            <span class="s0">else if</span><span class="s1">(party_type.equalsIgnoreCase(</span><span class="s4">&quot;Birthday&quot;</span><span class="s1">)) {</span>
+                <span class="s0">int </span><span class="s1">year = Integer.parseInt(sc.next())</span><span class="s0">;</span>
+                <span class="s1">party = </span><span class="s0">new <a href="../../model/party/Birthday.java.html">Birthday</a></span><span class="s1">(name</span><span class="s0">, </span><span class="s1">theme</span><span class="s0">, new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">,</span><span class="s1">location</span><span class="s0">,</span><span class="s1">time</span><span class="s0">,</span><span class="s1">age_limit</span><span class="s0">,</span><span class="s1">isOpen</span><span class="s0">, </span><span class="s1">year)</span><span class="s0">;</span>
+                <span class="s1">party.setGuestList_Holder(guestList)</span><span class="s0">;</span><span class="s1">}</span>
+            <span class="s0">else if</span><span class="s1">(party_type.equalsIgnoreCase(</span><span class="s4">&quot;Gift Exchange&quot;</span><span class="s1">)) {</span>
+                <span class="s1">sc.next()</span><span class="s0">; </span><span class="s1">sc.next()</span><span class="s0">; </span><span class="s5">//skip year, MemoryShowcase</span>
+                <span class="s0">int </span><span class="s1">limit = sc.nextInt()</span><span class="s0">;</span>
+                <span class="s1">party = </span><span class="s0">new <a href="../../model/party/GiftExchange.java.html">GiftExchange</a></span><span class="s1">(name</span><span class="s0">, </span><span class="s1">theme</span><span class="s0">, new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">,</span><span class="s1">location</span><span class="s0">,</span><span class="s1">time</span><span class="s0">,</span><span class="s1">age_limit</span><span class="s0">,</span><span class="s1">isOpen</span><span class="s0">, </span><span class="s1">limit)</span><span class="s0">;</span>
+                <span class="s1">party.setGuestList_Holder(guestList)</span><span class="s0">;</span><span class="s1">}</span>
+            <span class="s0">else if</span><span class="s1">(party_type.equalsIgnoreCase(</span><span class="s4">&quot;Graduation&quot;</span><span class="s1">)) {</span>
+                <span class="s1">sc.next()</span><span class="s0">; </span><span class="s1">sc.next()</span><span class="s0">;  </span><span class="s1">sc.next()</span><span class="s0">; </span><span class="s1">sc.next()</span><span class="s0">; </span><span class="s5">//skip year, MemoryShowcase,Limit,Registry</span>
+                <span class="s1">String gradAnnouncement = sc.next()</span><span class="s0">;</span>
+                <span class="s1">party = </span><span class="s0">new <a href="../../model/party/Graduation.java.html">Graduation</a></span><span class="s1">(name</span><span class="s0">, </span><span class="s1">theme</span><span class="s0">, new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">,</span><span class="s1">location</span><span class="s0">,</span><span class="s1">time</span><span class="s0">,</span><span class="s1">age_limit</span><span class="s0">,</span><span class="s1">isOpen</span><span class="s0">,</span><span class="s1">gradAnnouncement</span><span class="s0">,</span><span class="s1">type)</span><span class="s0">;</span>
+                <span class="s1">party.setGuestList_Holder(guestList)</span><span class="s0">;</span><span class="s1">}</span>
+            <span class="s0">else if</span><span class="s1">(party_type.equalsIgnoreCase(</span><span class="s4">&quot;Wedding&quot;</span><span class="s1">)) {</span>
+                <span class="s1">sc.next()</span><span class="s0">;  </span><span class="s1">sc.next()</span><span class="s0">; </span><span class="s1">sc.next()</span><span class="s0">; </span><span class="s5">//skip year, MemoryShowcase,Limit</span>
+                <span class="s1">List&lt;String&gt; registry = parseRegistry(sc.next())</span><span class="s0">;</span>
+                <span class="s1">party = </span><span class="s0">new <a href="../../model/party/Wedding.java.html">Wedding</a></span><span class="s1">(name</span><span class="s0">, </span><span class="s1">theme</span><span class="s0">, new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">,</span><span class="s1">location</span><span class="s0">,</span><span class="s1">time</span><span class="s0">,</span><span class="s1">age_limit</span><span class="s0">,</span><span class="s1">isOpen</span><span class="s0">,</span><span class="s1">registry)</span><span class="s0">;</span>
+                <span class="s1">party.setGuestList_Holder(guestList)</span><span class="s0">;</span><span class="s1">}</span>
+            <span class="s0">else </span><span class="s1">{System.err.println(</span><span class="s4">&quot;Unknown category in file: &quot; </span><span class="s1">+ party_type)</span><span class="s0">;</span><span class="s1">}</span>
+        <span class="s1">}</span>
+        <span class="s0">catch</span><span class="s1">(Exception e) {System.err.println(</span><span class="s4">&quot;Error reading line of file: &quot; </span><span class="s1">+ line + </span><span class="s4">&quot;</span><span class="s0">\n</span><span class="s4">error; &quot; </span><span class="s1">+ e)</span><span class="s0">;</span><span class="s1">}</span>
+
+        <span class="s0">return </span><span class="s1">party</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+    <span class="s5">/* 
+    private static Event parseSpecific(Event party, String rest) { 
+        // Type,Year,MemoryShowcase,Limit,Registry,gradAnnouncement 
+        try { 
+            Scanner sc = new Scanner(rest); 
+            sc.useDelimiter(&quot;,&quot;); 
+            String type = sc.next(); 
+            int year = Integer.parseInt(sc.next()); 
+            boolean MemoryShowcase = sc.nextBoolean(); 
+            int limit = Integer.parseInt(sc.next()); 
+            List&lt;String&gt; registry = parseRegistry(sc.next()); 
+            String gradAnnouncement = sc.next(); 
+            System.out.println(&quot;gradAnnouncement &quot; + gradAnnouncement); 
+            if(party instanceof Anniversary) { 
+                ((Anniversary) party).setType(type); 
+                ((Anniversary) party).setYear(year); 
+                ((Anniversary) party).setShowcase(MemoryShowcase); 
+            } 
+            else if(party instanceof Birthday) { 
+                ((Birthday) party).setAge(year);} 
+            else if(party instanceof GiftExchange) { 
+                ((GiftExchange) party).setLimit(limit);} 
+            else if(party instanceof Graduation) { 
+                ((Graduation) party).setGradAnnouncement(gradAnnouncement); 
+                ((Graduation) party).setType(type); 
+            } 
+            else if(party instanceof Wedding) { 
+                ((Wedding) party).setRegistry(registry);} 
+            else {System.err.println(&quot;Unknown party in file: &quot; + party.getName());} 
+        } 
+        catch(Exception e) {System.err.println(&quot;Error reading line of file: &quot; + rest + &quot;\nerror; &quot; + e);} 
+        return party; 
+    } 
+ 
+     */</span>
+
+<span class="s5">//parse the Registry</span>
+    <span class="s0">private static </span><span class="s1">List&lt;String&gt; parseRegistry(String next) {</span>
+        <span class="s1">List&lt;String&gt; registry = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">;</span>
+        <span class="s1">Scanner sc = </span><span class="s0">new </span><span class="s1">Scanner(next)</span><span class="s0">;  </span><span class="s1">sc.useDelimiter(</span><span class="s4">&quot;/&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">while </span><span class="s1">(sc.hasNext()) {</span>
+            <span class="s1">String item = sc.next()</span><span class="s0">;</span>
+            <span class="s1">registry.add(item)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">return </span><span class="s1">registry</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+
+
+    <span class="s5">//parse a string of guest into a time</span>
+    <span class="s0">private static </span><span class="s1">LocalDate parseTime(String next) {</span>
+        <span class="s1">Scanner sc = </span><span class="s0">new </span><span class="s1">Scanner(next)</span><span class="s0">;  </span><span class="s1">sc.useDelimiter(</span><span class="s4">&quot;-&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">int </span><span class="s1">year = </span><span class="s6">0</span><span class="s0">; int </span><span class="s1">month = </span><span class="s6">0</span><span class="s0">; int </span><span class="s1">date = </span><span class="s6">0</span><span class="s0">;</span>
+        <span class="s0">while </span><span class="s1">(sc.hasNext()) {</span>
+            <span class="s1">year = Integer.parseInt(sc.next())</span><span class="s0">;</span>
+            <span class="s1">month = Integer.parseInt(sc.next())</span><span class="s0">;</span>
+            <span class="s1">date = Integer.parseInt(sc.next())</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s1">LocalDate time = LocalDate.of(year</span><span class="s0">, </span><span class="s1">month</span><span class="s0">, </span><span class="s1">date)</span><span class="s0">;</span>
+        <span class="s0">return </span><span class="s1">time</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">private static </span><span class="s1">List&lt;String&gt; parseGuest(String next) {</span>
+        <span class="s1">List&lt;String&gt; guestList = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">;</span>
+        <span class="s1">Scanner sc = </span><span class="s0">new </span><span class="s1">Scanner(next)</span><span class="s0">; </span><span class="s1">sc.useDelimiter(</span><span class="s4">&quot;/&quot;</span><span class="s1">)</span><span class="s0">;    </span><span class="s5">//System.out.println(&quot;parsing guest&quot;+next);</span>
+        <span class="s0">while </span><span class="s1">(sc.hasNext()) {</span>
+            <span class="s1">String guest_name = sc.next()</span><span class="s0">;          </span><span class="s5">//System.out.println(&quot;parsing guest &quot;+guest_name);</span>
+            <span class="s1">guestList.add(guest_name)</span><span class="s0">;</span><span class="s1">}</span>
+        <span class="s0">return </span><span class="s1">guestList</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+
+    <span class="s5">//parse one line of the CSV file into one User object, referenced from the A11 StoreFactory</span>
+    <span class="s0">private static <a href="../../model/people/User.java.html">User</a> </span><span class="s1">parseUser(String line) {</span>
+        <span class="s5">//Header: Type,Name,Email,Password,Gift,PartyHosting</span>
+        <a href="../../model/people/User.java.html">User</a> <span class="s1">user = </span><span class="s0">null;</span>
+        <span class="s0">try </span><span class="s1">{</span>
+            <span class="s1">Scanner sc = </span><span class="s0">new </span><span class="s1">Scanner(line)</span><span class="s0">;</span>
+            <span class="s1">sc.useDelimiter(</span><span class="s4">&quot;,&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">String type = sc.next()</span><span class="s0">;</span>
+            <span class="s1">String name = sc.next()</span><span class="s0">;</span>
+            <span class="s1">String email = sc.next()</span><span class="s0">;</span>
+            <span class="s1">String password = sc.next()</span><span class="s0">;</span>
+            <span class="s1">String gift = sc.next()</span><span class="s0">;</span>
+            <span class="s0">if</span><span class="s1">(type.equalsIgnoreCase(</span><span class="s4">&quot;Host&quot;</span><span class="s1">)) {</span>
+                <span class="s1">List&lt;String&gt; partyHosting_holder = parsePartyHosting(sc.next())</span><span class="s0">;</span>
+                <span class="s1">user = </span><span class="s0">new <a href="../../model/people/Host.java.html">Host</a></span><span class="s1">(name</span><span class="s0">, </span><span class="s1">email</span><span class="s0">, </span><span class="s1">password)</span><span class="s0">;</span>
+                <span class="s0">if</span><span class="s1">(user </span><span class="s0">instanceof  <a href="../../model/people/Host.java.html">Host</a></span><span class="s1">){</span>
+                    <span class="s1">((<a href="../../model/people/Host.java.html">Host</a>) user).setPartyHosting_holder(partyHosting_holder)</span><span class="s0">;</span>
+                    <span class="s1">((<a href="../../model/people/Host.java.html">Host</a>) user).setGift(gift)</span><span class="s0">;</span><span class="s1">}</span>
+            <span class="s1">}</span>
+            <span class="s0">else if</span><span class="s1">(type.equalsIgnoreCase(</span><span class="s4">&quot;Guest&quot;</span><span class="s1">)) {</span>
+                <span class="s1">user = </span><span class="s0">new <a href="../../model/people/Guest.java.html">Guest</a></span><span class="s1">(name</span><span class="s0">, </span><span class="s1">email</span><span class="s0">, </span><span class="s1">password)</span><span class="s0">;</span>
+                <span class="s0">if</span><span class="s1">(user </span><span class="s0">instanceof  <a href="../../model/people/Guest.java.html">Guest</a></span><span class="s1">){</span>
+                    <span class="s1">((<a href="../../model/people/Guest.java.html">Guest</a>) user).setGift(gift)</span><span class="s0">;</span><span class="s1">}</span>
+            <span class="s1">}</span><span class="s0">else </span><span class="s1">{System.err.println(</span><span class="s4">&quot;Unknown user in file: &quot; </span><span class="s1">+ type)</span><span class="s0">;</span><span class="s1">}</span>
+        <span class="s1">}</span>
+        <span class="s0">catch</span><span class="s1">(Exception e) {System.err.println(</span><span class="s4">&quot;Error reading line of file in User data: &quot; </span><span class="s1">+ line + </span><span class="s4">&quot;</span><span class="s0">\n</span><span class="s4">error; &quot; </span><span class="s1">+ e)</span><span class="s0">;</span><span class="s1">}</span>
+        <span class="s0">return </span><span class="s1">user</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+
+
+
+    <span class="s0">private static </span><span class="s1">List&lt;String&gt; parsePartyHosting(String partyHosting) {</span>
+        <span class="s1">List&lt;String&gt; party = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">;</span>
+        <span class="s1">Scanner sc = </span><span class="s0">new </span><span class="s1">Scanner(partyHosting)</span><span class="s0">;</span>
+        <span class="s1">sc.useDelimiter(</span><span class="s4">&quot;/&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">while </span><span class="s1">(sc.hasNext()) {</span>
+            <span class="s1">String party_name = sc.next()</span><span class="s0">;</span>
+            <span class="s1">party.add(party_name)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">return </span><span class="s1">party</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+
+    <span class="s5">//write user date to file, referenced from  BookTeaque, Part 2 BookFileHelper</span>
+    <span class="s0">public static void </span><span class="s1">writeUserToFile(String file</span><span class="s0">, </span><span class="s1">List&lt;User&gt; list){</span>
+        <span class="s1">String header = </span><span class="s4">&quot;Type,Name,Email,Password,Gift,PartyHosting</span><span class="s0">\n</span><span class="s4">&quot;</span><span class="s0">;</span>
+        <span class="s0">try</span><span class="s1">(FileOutputStream fos = </span><span class="s0">new </span><span class="s1">FileOutputStream(file)</span><span class="s0">;</span>
+            <span class="s1">PrintWriter pw = </span><span class="s0">new </span><span class="s1">PrintWriter(fos)){</span>
+            <span class="s1">pw.println(header)</span><span class="s0">;  </span><span class="s5">//write the header</span>
+            <span class="s0">for</span><span class="s1">(<a href="../../model/people/User.java.html">User</a> u: list){</span>
+                <span class="s0">if </span><span class="s1">(u </span><span class="s0">instanceof <a href="../../model/people/Host.java.html">Host</a></span><span class="s1">) {</span>
+                    <span class="s1">String partyHosting = </span><span class="s4">&quot;&quot;</span><span class="s0">;</span>
+                    <span class="s0">int </span><span class="s1">j = ((<a href="../../model/people/Host.java.html">Host</a>) u).getPartyHosting_holder().size()</span><span class="s0">;</span>
+                    <span class="s0">int </span><span class="s1">number = </span><span class="s6">0</span><span class="s0">;</span>
+                    <span class="s0">for</span><span class="s1">(String party_name: ((<a href="../../model/people/Host.java.html">Host</a>) u).getPartyHosting_holder()){</span>
+                        <span class="s1">partyHosting += party_name</span><span class="s0">;</span>
+                        <span class="s0">if </span><span class="s1">(number &lt; (j - </span><span class="s6">1</span><span class="s1">)) {</span>
+                            <span class="s1">partyHosting += </span><span class="s4">&quot;/&quot;</span><span class="s0">;</span>
+                            <span class="s1">number++</span><span class="s0">;</span><span class="s1">}</span>
+                    <span class="s1">}</span>
+                    <span class="s1">pw.println(u.getClass().getSimpleName() + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ u.getName() + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ u.getEmail() + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ u.getPassword() + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ ((<a href="../../model/people/Host.java.html">Host</a>) u).getGift()+ </span><span class="s4">&quot;,&quot; </span><span class="s1">+ partyHosting)</span><span class="s0">;</span>
+                <span class="s1">}</span><span class="s0">else if</span><span class="s1">(u </span><span class="s0">instanceof <a href="../../model/people/Guest.java.html">Guest</a></span><span class="s1">){</span>
+                    <span class="s1">pw.println(u.getClass().getSimpleName() + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ u.getName() + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ u.getEmail()</span>
+                            <span class="s1">+ </span><span class="s4">&quot;,&quot; </span><span class="s1">+ u.getPassword() + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ ((<a href="../../model/people/Guest.java.html">Guest</a>) u).getGift())</span><span class="s0">;</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span>
+        <span class="s0">catch </span><span class="s1">(IOException e){</span>
+            <span class="s1">System.err.println(</span><span class="s4">&quot;Error writing to file&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">e.printStackTrace()</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s1">System.out.println(</span><span class="s4">&quot;Wrote the list of users to the file: &quot; </span><span class="s1">+ file)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+
+
+    <span class="s5">//write party data to file, referenced from  BookTeaque, Part 2 BookFileHelper</span>
+    <span class="s0">public static void </span><span class="s1">writePartyToFile(String file</span><span class="s0">, </span><span class="s1">List&lt;Event&gt; list){</span>
+        <span class="s1">String header = </span><span class="s4">&quot;party_type,name,theme,guestList,location,time,age limit,isopen,Type,Year,MemoryShowcase,Limit,Registry,gradAnnouncement</span><span class="s0">\n</span><span class="s4">&quot;</span><span class="s0">;</span>
+        <span class="s0">try</span><span class="s1">(FileOutputStream fos = </span><span class="s0">new </span><span class="s1">FileOutputStream(file)</span><span class="s0">;</span>
+            <span class="s1">PrintWriter pw = </span><span class="s0">new </span><span class="s1">PrintWriter(fos)){        pw.println(header)</span><span class="s0">;  </span><span class="s5">//write the header</span>
+            <span class="s0">for</span><span class="s1">(<a href="../../model/party/Event.java.html">Event</a> e: list) {</span>
+                <span class="s1">String registry = </span><span class="s4">&quot;&quot;</span><span class="s0">;</span>
+                <span class="s1">String guests = </span><span class="s4">&quot;&quot;</span><span class="s0">;</span>
+                <span class="s1">String party_type = e.getClass().getSimpleName()</span><span class="s0">;</span>
+                <span class="s0">int </span><span class="s1">i = e.getGuestList().size()</span><span class="s0">;        int </span><span class="s1">num = </span><span class="s6">0</span><span class="s0">;</span>
+                <span class="s0">for </span><span class="s1">(<a href="../../model/people/User.java.html">User</a> u : e.getGuestList()) {</span>
+                    <span class="s1">guests += u.getName()</span><span class="s0">;</span>
+                    <span class="s0">if </span><span class="s1">(num &lt; (i - </span><span class="s6">1</span><span class="s1">)) {</span>
+                        <span class="s1">guests += </span><span class="s4">&quot;/&quot;</span><span class="s0">;</span>
+                        <span class="s1">num++</span><span class="s0">;</span><span class="s1">}</span>
+                <span class="s1">}</span>
+                <span class="s1">String general = party_type + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ e.getName() + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ e.getTheme() + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ guests + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ e.getLocation() + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ e.getTime() + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ e.hasAgeLimit() + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ e.isOpen()</span><span class="s0">;</span>
+                <span class="s5">//Type,Year,MemoryShowcase,Limit,Registry,gradAnnouncement</span>
+                <span class="s0">if </span><span class="s1">(party_type.equalsIgnoreCase(</span><span class="s4">&quot;Anniversary&quot;</span><span class="s1">)) {</span>
+                    <span class="s0">if </span><span class="s1">(e </span><span class="s0">instanceof <a href="../../model/party/Anniversary.java.html">Anniversary</a></span><span class="s1">) {pw.println(general + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ ((<a href="../../model/party/Anniversary.java.html">Anniversary</a>) e).getType() + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ ((<a href="../../model/party/Anniversary.java.html">Anniversary</a>) e).getYear() + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ ((<a href="../../model/party/Anniversary.java.html">Anniversary</a>) e).isMemoryShowcase())</span><span class="s0">;</span><span class="s1">}</span>
+                <span class="s1">} </span><span class="s0">else if </span><span class="s1">(party_type.equalsIgnoreCase(</span><span class="s4">&quot;Birthday&quot;</span><span class="s1">)) {</span>
+                    <span class="s0">if </span><span class="s1">(e </span><span class="s0">instanceof <a href="../../model/party/Birthday.java.html">Birthday</a></span><span class="s1">) {pw.println(general + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ ((<a href="../../model/party/Birthday.java.html">Birthday</a>) e).getAge())</span><span class="s0">;</span><span class="s1">}</span>
+                <span class="s1">} </span><span class="s0">else if </span><span class="s1">(party_type.equalsIgnoreCase(</span><span class="s4">&quot;GiftExchange&quot;</span><span class="s1">)) {</span>
+                    <span class="s0">if </span><span class="s1">(e </span><span class="s0">instanceof <a href="../../model/party/GiftExchange.java.html">GiftExchange</a></span><span class="s1">) {pw.println(general + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ </span><span class="s4">&quot;,&quot; </span><span class="s1">+ </span><span class="s4">&quot;,&quot; </span><span class="s1">+ ((<a href="../../model/party/GiftExchange.java.html">GiftExchange</a>) e).getLimit())</span><span class="s0">;</span><span class="s1">}</span>
+                <span class="s1">} </span><span class="s0">else if </span><span class="s1">(party_type.equalsIgnoreCase(</span><span class="s4">&quot;Graduation&quot;</span><span class="s1">)) {</span>
+                    <span class="s0">if </span><span class="s1">(e </span><span class="s0">instanceof <a href="../../model/party/Graduation.java.html">Graduation</a></span><span class="s1">) {pw.println(general + ((<a href="../../model/party/Graduation.java.html">Graduation</a>) e).getType() + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ </span><span class="s4">&quot;,&quot; </span><span class="s1">+ </span><span class="s4">&quot;,&quot; </span><span class="s1">+ </span><span class="s4">&quot;,&quot; </span><span class="s1">+ ((<a href="../../model/party/Graduation.java.html">Graduation</a>) e).getGradAnnouncement())</span><span class="s0">;</span><span class="s1">}</span>
+                <span class="s1">} </span><span class="s0">else if </span><span class="s1">(party_type.equalsIgnoreCase(</span><span class="s4">&quot;Wedding&quot;</span><span class="s1">)) {</span>
+                    <span class="s0">if </span><span class="s1">(e </span><span class="s0">instanceof <a href="../../model/party/Wedding.java.html">Wedding</a></span><span class="s1">) {</span>
+                        <span class="s0">int </span><span class="s1">j = ((<a href="../../model/party/Wedding.java.html">Wedding</a>) e).getRegistry().size()</span><span class="s0">;      int </span><span class="s1">number = </span><span class="s6">0</span><span class="s0">;</span>
+                        <span class="s0">for </span><span class="s1">(String item : ((<a href="../../model/party/Wedding.java.html">Wedding</a>) e).getRegistry()) {</span>
+                            <span class="s1">registry += item</span><span class="s0">;</span>
+                            <span class="s0">if </span><span class="s1">(number &lt; (j - </span><span class="s6">1</span><span class="s1">)) {</span>
+                                <span class="s1">registry += </span><span class="s4">&quot;/&quot;</span><span class="s0">;</span>
+                                <span class="s1">number++</span><span class="s0">;</span><span class="s1">}</span>
+                        <span class="s1">}</span>
+                        <span class="s1">pw.println(general + </span><span class="s4">&quot;,&quot; </span><span class="s1">+ </span><span class="s4">&quot;,&quot; </span><span class="s1">+ </span><span class="s4">&quot;,&quot; </span><span class="s1">+ </span><span class="s4">&quot;,&quot; </span><span class="s1">+ registry)</span><span class="s0">;</span><span class="s1">}</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span>
+        <span class="s0">catch </span><span class="s1">(IOException e){System.err.println(</span><span class="s4">&quot;Error writing to file&quot;</span><span class="s1">)</span><span class="s0">;</span><span class="s1">e.printStackTrace()</span><span class="s0">;</span><span class="s1">}</span>
+        <span class="s1">System.out.println(</span><span class="s4">&quot;Wrote the list of parties to the file: &quot; </span><span class="s1">+ file)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+
+<span class="s1">}</span>
+</pre>
+</body>
+</html>

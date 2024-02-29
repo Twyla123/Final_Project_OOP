@@ -1,0 +1,253 @@
+<html>
+<head>
+<title>UIPopUp.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #629755; font-style: italic;}
+.s3 { color: #629755; font-weight: bold; font-style: italic;}
+.s4 { color: #6a8759;}
+.s5 { color: #6897bb;}
+.s6 { color: #808080;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+UIPopUp.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">view</span><span class="s0">;</span>
+
+
+<span class="s0">import </span><span class="s1">javax.swing.*</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.time.LocalDate</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.time.Month</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.util.List</span><span class="s0">;</span>
+
+<span class="s2">/**</span>
+ <span class="s2">* UI is a utility class for ITP 265 that helps provide a friendly way to read input from</span>
+ <span class="s2">* a user and verify that the input is correct.</span>
+ <span class="s2">* </span>
+ <span class="s2">* </span><span class="s3">@author </span><span class="s2">Kendra Walther</span>
+ <span class="s2">* ITP 265</span>
+ <span class="s2">* Email: kwalther@usc.edu </span>
+ <span class="s2">*</span>
+ <span class="s2">*/</span>
+
+<span class="s0">public class </span><span class="s1">UIPopUp  </span><span class="s0">implements <a href="UI.java.html">UI</a> </span><span class="s1">{</span>
+
+
+	<span class="s2">/**</span>
+	 <span class="s2">* Short-cut helper method for print</span>
+	 <span class="s2">* </span><span class="s3">@param </span><span class="s2">output: The String to be printed</span>
+	 <span class="s2">*/</span>
+	<span class="s0">public void </span><span class="s1">print(String output) {</span>
+		<span class="s1">JOptionPane.showMessageDialog(</span><span class="s0">null, </span><span class="s1">output)</span><span class="s0">;</span>
+	<span class="s1">}</span>
+
+	<span class="s0">public void </span><span class="s1">print(Object o) {</span>
+		<span class="s1">print(o.toString())</span><span class="s0">;</span>
+	<span class="s1">}</span>
+
+	<span class="s0">public void </span><span class="s1">printPretty(String output) {</span>
+		<span class="s1">JOptionPane.showMessageDialog(</span><span class="s0">null, </span><span class="s1">output)</span><span class="s0">;</span>
+	<span class="s1">}</span>
+
+	<span class="s1">@Override</span>
+	<span class="s0">public void </span><span class="s1">printPretty(List list) {</span>
+		<span class="s1">String s = </span><span class="s4">&quot;List Contains:&quot;</span><span class="s0">;</span>
+		<span class="s0">for</span><span class="s1">(Object o: list) {</span>
+			<span class="s1">s+= o + </span><span class="s4">&quot;</span><span class="s0">\n</span><span class="s4">&quot;</span><span class="s0">;</span>
+		<span class="s1">}</span>
+		<span class="s1">printPretty(s)</span><span class="s0">;</span>
+	<span class="s1">}</span>
+
+	<span class="s0">public </span><span class="s1">String input(String prompt) {</span>
+		<span class="s1">String s = JOptionPane.showInputDialog(</span><span class="s0">null, </span><span class="s1">prompt)</span><span class="s0">;</span>
+		<span class="s0">return </span><span class="s1">s</span><span class="s0">;</span>
+	<span class="s1">}</span>
+
+
+	<span class="s0">public </span><span class="s1">String inputWord(String prompt) {</span>
+		<span class="s0">return </span><span class="s1">input(prompt)</span><span class="s0">;</span>
+	<span class="s1">}</span>
+
+
+	<span class="s0">public </span><span class="s1">String inputWord(String prompt</span><span class="s0">, </span><span class="s1">String option1</span><span class="s0">, </span><span class="s1">String option2) {</span>
+		<span class="s1">String[] options = {option1</span><span class="s0">, </span><span class="s1">option2}</span><span class="s0">;</span>
+		<span class="s1">String s = (String)JOptionPane.showInputDialog(</span><span class="s0">null, </span><span class="s1">prompt</span><span class="s0">,</span><span class="s4">&quot;PopUp&quot;</span><span class="s0">, </span><span class="s1">JOptionPane.QUESTION_MESSAGE</span><span class="s0">, </span>
+				<span class="s0">null, </span><span class="s1">options</span><span class="s0">, </span><span class="s1">options[</span><span class="s5">0</span><span class="s1">])</span><span class="s0">;</span>
+		<span class="s0">return </span><span class="s1">s</span><span class="s0">;</span>
+
+	<span class="s1">}</span>
+
+	<span class="s1">@Override</span>
+	<span class="s0">public </span><span class="s1">String inputWord(String prompt</span><span class="s0">, </span><span class="s1">String... matches) {</span>
+		<span class="s6">//TODO</span>
+		<span class="s0">return null;</span>
+	<span class="s1">}</span>
+
+	<span class="s2">/**</span>
+	 <span class="s2">* Prompt the user and read an int, clearing whitespace or the enter after the number</span>
+	 <span class="s2">* </span><span class="s3">@param </span><span class="s2">prompt: the question to ask the user </span>
+	 <span class="s2">* </span><span class="s3">@return: </span><span class="s2">an int </span>
+	 <span class="s2">*/</span>
+	<span class="s0">public int </span><span class="s1">inputInt(String prompt) {</span>
+
+		<span class="s0">int </span><span class="s1">value = </span><span class="s5">0</span><span class="s0">;</span>
+		<span class="s0">boolean </span><span class="s1">gotNumber = </span><span class="s0">false;</span>
+		<span class="s0">while </span><span class="s1">(!gotNumber) {</span>
+			<span class="s1">String s = JOptionPane.showInputDialog(</span><span class="s0">null, </span><span class="s1">prompt)</span><span class="s0">;</span>
+			<span class="s0">try </span><span class="s1">{</span>
+				<span class="s1">value = Integer.parseInt(s)</span><span class="s0">;</span>
+				<span class="s1">gotNumber = </span><span class="s0">true;</span>
+			<span class="s1">}</span>
+			<span class="s0">catch</span><span class="s1">(Exception e) {</span>
+				<span class="s1">JOptionPane.showMessageDialog(</span><span class="s0">null, </span><span class="s1">s + </span><span class="s4">&quot; was not a valid int&quot;</span><span class="s0">, </span><span class="s4">&quot;Pop Up&quot;</span><span class="s0">, </span>
+						<span class="s1">JOptionPane.ERROR_MESSAGE)</span><span class="s0">;</span>
+
+			<span class="s1">}</span>
+		<span class="s1">}</span>
+		<span class="s0">return </span><span class="s1">value</span><span class="s0">;</span>
+	<span class="s1">}</span>
+
+	<span class="s2">/**</span>
+	 <span class="s2">* Prompt the user and read an int between (inclusive) of minValue and maxValue, clearing whitespace or the enter after the number</span>
+	 <span class="s2">* </span><span class="s3">@param </span><span class="s2">prompt: the question to ask the user </span>
+	 <span class="s2">* </span><span class="s3">@return: </span><span class="s2">an int between minValue and maxValue</span>
+	 <span class="s2">*/</span>
+	<span class="s0">public int </span><span class="s1">inputInt(String prompt</span><span class="s0">, int </span><span class="s1">minValue</span><span class="s0">, int </span><span class="s1">maxValue) {</span>
+		<span class="s0">int </span><span class="s1">num = inputInt(prompt)</span><span class="s0">; </span><span class="s6">// make sure you get a num</span>
+		<span class="s0">while</span><span class="s1">(num &lt; minValue || num &gt; maxValue) {</span>
+			<span class="s1">String msg = num  + </span><span class="s4">&quot; is not in the allowed range: [&quot; </span><span class="s1">+ minValue</span>
+					<span class="s1">+ </span><span class="s4">&quot;-&quot; </span><span class="s1">+ maxValue + </span><span class="s4">&quot;]&quot;</span><span class="s0">;</span>
+			<span class="s1">JOptionPane.showMessageDialog(</span><span class="s0">null,  </span><span class="s1">msg</span><span class="s0">, </span><span class="s4">&quot;Pop Up&quot;</span><span class="s0">, </span>
+					<span class="s1">JOptionPane.ERROR_MESSAGE)</span><span class="s0">;</span>
+			<span class="s1">num = inputInt(prompt)</span><span class="s0">; </span><span class="s6">// make sure you get a num</span>
+		<span class="s1">}</span>
+		<span class="s0">return </span><span class="s1">num</span><span class="s0">;</span>
+	<span class="s1">}</span>
+
+
+	<span class="s2">/**</span>
+	 <span class="s2">* Prompt the user and read an int between (inclusive) of minValue and maxValue, </span>
+	 <span class="s2">* (or sentinel quitValue) clearing whitespace or the enter after the number</span>
+	 <span class="s2">* </span><span class="s3">@param </span><span class="s2">prompt the question to ask the user</span>
+	 <span class="s2">* </span><span class="s3">@param </span><span class="s2">minValue</span>
+	 <span class="s2">* </span><span class="s3">@param </span><span class="s2">maxValue</span>
+	 <span class="s2">* </span><span class="s3">@param </span><span class="s2">quitValue</span>
+	 <span class="s2">* </span><span class="s3">@return </span><span class="s2">an int between minValue and maxValue (or quit sentinel value)</span>
+	 <span class="s2">*/</span>
+	<span class="s0">public int </span><span class="s1">inputInt(String prompt</span><span class="s0">, int </span><span class="s1">minValue</span><span class="s0">, int </span><span class="s1">maxValue</span><span class="s0">, int </span><span class="s1">quitValue) {</span>
+		<span class="s0">int </span><span class="s1">num = inputInt(prompt)</span><span class="s0">; </span><span class="s6">// make sure you get a num</span>
+
+		<span class="s0">while</span><span class="s1">(num != quitValue &amp;&amp; (num &lt; minValue || num &gt; maxValue)) {</span>
+			<span class="s1">String msg = num + </span><span class="s4">&quot; is not in the allowed range: [&quot; </span><span class="s1">+ minValue</span>
+					<span class="s1">+ </span><span class="s4">&quot;-&quot; </span><span class="s1">+ maxValue + </span><span class="s4">&quot;] (or &quot; </span><span class="s1">+ quitValue + </span><span class="s4">&quot; to quit)&quot;</span><span class="s0">;</span>
+			<span class="s1">JOptionPane.showMessageDialog(</span><span class="s0">null,  </span><span class="s1">msg</span><span class="s0">, </span><span class="s4">&quot;Pop Up&quot;</span><span class="s0">, </span>
+					<span class="s1">JOptionPane.ERROR_MESSAGE)</span><span class="s0">;</span>
+
+		<span class="s1">}</span>
+		<span class="s0">return </span><span class="s1">num</span><span class="s0">;</span>
+	<span class="s1">}</span>
+	<span class="s2">/**</span>
+	 <span class="s2">* Prompt the user and read a postive (&gt;=0) int, clearing whitespace or the enter after the number</span>
+	 <span class="s2">* </span><span class="s3">@param </span><span class="s2">prompt: the question to ask the user </span>
+	 <span class="s2">* </span><span class="s3">@return: </span><span class="s2">an int &gt;= 0</span>
+	 <span class="s2">*/</span>
+	<span class="s0">public int </span><span class="s1">inputPostiveInt(String prompt) {</span>
+		<span class="s6">// use the fact inputInt works....</span>
+		<span class="s0">int </span><span class="s1">num = inputInt(prompt)</span><span class="s0">; </span><span class="s6">// off-loaded work</span>
+		<span class="s0">while</span><span class="s1">(num &lt; </span><span class="s5">0</span><span class="s1">) { </span><span class="s6">//not positive....</span>
+			<span class="s1">JOptionPane.showMessageDialog(</span><span class="s0">null,  </span><span class="s4">&quot;Need a positive number&quot;</span><span class="s0">, </span><span class="s4">&quot;Pop Up&quot;</span><span class="s0">, </span>
+					<span class="s1">JOptionPane.ERROR_MESSAGE)</span><span class="s0">;</span>
+			<span class="s1">num = inputInt(prompt)</span><span class="s0">;</span>
+		<span class="s1">}</span>
+		<span class="s0">return </span><span class="s1">num</span><span class="s0">;</span>
+
+	<span class="s1">}</span>
+	<span class="s2">/**</span>
+	 <span class="s2">* Prompt the user and read a floating point number, clearing whitespace or the enter after the number</span>
+	 <span class="s2">* </span><span class="s3">@param </span><span class="s2">prompt: the question to ask the user </span>
+	 <span class="s2">* </span><span class="s3">@return: </span><span class="s2">a double value </span>
+	 <span class="s2">*/</span>
+	<span class="s0">public double </span><span class="s1">inputDouble(String prompt) {</span>
+		<span class="s0">double </span><span class="s1">value = </span><span class="s5">0</span><span class="s0">;</span>
+		<span class="s0">boolean </span><span class="s1">gotNumber = </span><span class="s0">false;</span>
+		<span class="s0">while </span><span class="s1">(!gotNumber) {</span>
+			<span class="s1">String s = JOptionPane.showInputDialog(</span><span class="s0">null, </span><span class="s1">prompt)</span><span class="s0">;</span>
+			<span class="s0">try </span><span class="s1">{</span>
+				<span class="s1">value = Double.parseDouble(s)</span><span class="s0">;</span>
+				<span class="s1">gotNumber = </span><span class="s0">true;</span>
+			<span class="s1">}</span>
+			<span class="s0">catch</span><span class="s1">(Exception e) {</span>
+				<span class="s1">JOptionPane.showMessageDialog(</span><span class="s0">null, </span><span class="s1">s + </span><span class="s4">&quot; was not a valid double&quot;</span><span class="s0">, </span><span class="s4">&quot;Pop Up&quot;</span><span class="s0">, </span>
+						<span class="s1">JOptionPane.ERROR_MESSAGE)</span><span class="s0">;</span>
+
+			<span class="s1">}</span>
+		<span class="s1">}</span>
+		<span class="s0">return </span><span class="s1">value</span><span class="s0">;</span>
+	<span class="s1">}</span>
+	<span class="s2">/**</span>
+	 <span class="s2">* Prompt the user and read a boolean value, clearing whitespace or the enter after the number</span>
+	 <span class="s2">* </span><span class="s3">@param </span><span class="s2">prompt: the question to ask the user </span>
+	 <span class="s2">* </span><span class="s3">@return: </span><span class="s2">a boolean value </span>
+	 <span class="s2">*/</span>
+	<span class="s0">public boolean </span><span class="s1">inputBoolean(String prompt) {</span>
+		<span class="s0">int </span><span class="s1">value = JOptionPane.showConfirmDialog(</span><span class="s0">null, </span><span class="s1">prompt</span><span class="s0">, </span><span class="s4">&quot;Pop Up&quot;</span><span class="s0">, </span><span class="s1">JOptionPane.YES_NO_OPTION)</span><span class="s0">;</span>
+		<span class="s0">if</span><span class="s1">(value == JOptionPane.YES_OPTION) {</span>
+			<span class="s0">return true;</span>
+		<span class="s1">}</span>
+		<span class="s0">else </span><span class="s1">{</span>
+			<span class="s0">return false;</span>
+		<span class="s1">}</span>
+	<span class="s1">}</span>
+
+	<span class="s2">/**</span>
+	 <span class="s2">* Prompt the user enter yes or no (will match y/yes and n/no any case) and return true for yes and false for no.</span>
+	 <span class="s2">* </span><span class="s3">@param </span><span class="s2">prompt: the question to ask the user </span>
+	 <span class="s2">* </span><span class="s3">@return: </span><span class="s2">a boolean value </span>
+	 <span class="s2">*/</span>
+	<span class="s0">public boolean </span><span class="s1">inputYesNo(String prompt) {</span>
+		<span class="s1">String[] options = {</span><span class="s4">&quot;yes&quot;</span><span class="s0">, </span><span class="s4">&quot;no&quot;</span><span class="s1">}</span><span class="s0">;</span>
+		<span class="s0">int </span><span class="s1">index = JOptionPane.showOptionDialog(</span><span class="s0">null, </span><span class="s1">prompt</span><span class="s0">, </span><span class="s4">&quot;popup&quot;</span><span class="s0">, </span><span class="s1">JOptionPane.YES_NO_OPTION</span><span class="s0">,</span>
+				<span class="s1">JOptionPane.QUESTION_MESSAGE</span><span class="s0">, null, </span><span class="s1">options</span><span class="s0">, </span><span class="s1">options[</span><span class="s5">0</span><span class="s1">])</span><span class="s0">;</span>
+
+		<span class="s0">if</span><span class="s1">(index == </span><span class="s5">0</span><span class="s1">) {</span>
+			<span class="s0">return true;</span>
+		<span class="s1">}</span>
+		<span class="s0">else </span><span class="s1">{</span>
+			<span class="s0">return false;</span>
+		<span class="s1">}</span>
+
+
+	<span class="s1">}</span>
+
+	<span class="s1">@Override</span>
+	<span class="s0">public </span><span class="s1">LocalDate inputDate(String prompt) {</span>
+		<span class="s0">int </span><span class="s1">year = </span><span class="s0">this</span><span class="s1">.inputInt(prompt + </span><span class="s4">&quot;</span><span class="s0">\t</span><span class="s4">Year: &quot;</span><span class="s0">, </span><span class="s5">1900</span><span class="s0">, </span><span class="s1">LocalDate.now().getYear())</span><span class="s0">;</span>
+		<span class="s0">int </span><span class="s1">month = </span><span class="s0">this</span><span class="s1">.inputInt(prompt + </span><span class="s4">&quot;</span><span class="s0">\t</span><span class="s4">Month (as num):&quot;</span><span class="s0">, </span><span class="s5">1</span><span class="s0">, </span><span class="s5">12</span><span class="s1">)</span><span class="s0">;</span>
+		<span class="s0">int </span><span class="s1">day = </span><span class="s0">this</span><span class="s1">.inputInt(prompt + </span><span class="s4">&quot;</span><span class="s0">\t</span><span class="s4">Day:&quot;</span><span class="s0">, </span><span class="s5">1</span><span class="s0">, </span><span class="s1">Month.of(month).maxLength())</span><span class="s0">;</span>
+		<span class="s0">return </span><span class="s1">LocalDate.of(year</span><span class="s0">, </span><span class="s1">month</span><span class="s0">, </span><span class="s1">day)</span><span class="s0">;</span>
+
+	<span class="s1">}</span>
+
+
+    <span class="s0">public </span><span class="s1">Object selectFromArray(Object[] values) {</span>
+		<span class="s1">Object choice = (Object) JOptionPane.showInputDialog(</span><span class="s0">null, </span><span class="s6">// frame</span>
+				<span class="s4">&quot;Select an option&quot;</span><span class="s0">, </span><span class="s6">// message&quot;</span>
+				<span class="s4">&quot;Select from array&quot;</span><span class="s0">, </span><span class="s6">// title</span>
+				<span class="s1">JOptionPane.QUESTION_MESSAGE</span><span class="s0">,  </span><span class="s6">//message Type</span>
+				<span class="s0">null, </span><span class="s6">// icon to display (null gets you duke)</span>
+				<span class="s1">values</span><span class="s0">, </span><span class="s6">// selection values (an array of Objects)</span>
+				<span class="s1">values[</span><span class="s5">0</span><span class="s1">])</span><span class="s0">; </span><span class="s6">// initial selection</span>
+
+		<span class="s0">return </span><span class="s1">choice</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+<span class="s1">}</span></pre>
+</body>
+</html>

@@ -1,0 +1,736 @@
+<html>
+<head>
+<title>Evite.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #629755; font-style: italic;}
+.s3 { color: #629755; font-weight: bold; font-style: italic;}
+.s4 { color: #808080;}
+.s5 { color: #6a8759;}
+.s6 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Evite.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">controller</span><span class="s0">;</span>
+
+<span class="s0">import <a href="../controller/setup/FileProcessor.java.html">controller.setup.FileProcessor</a>;</span>
+<span class="s0">import </span><span class="s1">model.party.*</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">model.people.*</span><span class="s0">;</span>
+<span class="s0">import <a href="../view/BFF.java.html">view.BFF</a>;</span>
+<span class="s0">import </span><span class="s1">java.time.LocalDate</span><span class="s0">;</span>
+<span class="s0">import </span><span class="s1">java.util.*</span><span class="s0">;</span>
+
+<span class="s2">/**</span>
+ <span class="s2">* Class Description</span>
+ <span class="s2">*</span>
+ <span class="s2">* </span><span class="s3">@author </span><span class="s2">Twyla Zhang</span>
+ <span class="s2">* email: twylazha@usc.edu</span>
+ <span class="s2">* ITP 265, Spring 2023, boba section</span>
+ <span class="s2">* Date: 5/1/23</span>
+ <span class="s2">*/</span>
+<span class="s0">public class </span><span class="s1">Evite {</span>
+    <span class="s0">private <a href="../model/people/User.java.html">User</a> </span><span class="s1">currentUser</span><span class="s0">;    </span><span class="s4">// the user who currently logged in the account</span>
+    <span class="s0">private final </span><span class="s1">Map&lt;User</span><span class="s0">, </span><span class="s1">List&lt;Event&gt;&gt; allParty</span><span class="s0">;     </span><span class="s4">//key is the user who created the party, value is Event</span>
+    <span class="s0">private <a href="../model/party/Event.java.html">Event</a> </span><span class="s1">currentParty</span><span class="s0">;     </span><span class="s4">//the party that the user is currently editing or creating</span>
+    <span class="s0">private final <a href="../view/BFF.java.html">BFF</a> </span><span class="s1">helper</span><span class="s0">;</span>
+    <span class="s0">private final </span><span class="s1">Map&lt;String</span><span class="s0">, </span><span class="s1">User&gt; allUsers</span><span class="s0">;    </span><span class="s4">//key is the username, and value is User</span>
+
+
+    <span class="s0">public </span><span class="s1">Evite() {</span>
+        <span class="s0">this</span><span class="s1">.currentUser = </span><span class="s0">null;</span>
+        <span class="s0">this</span><span class="s1">.helper = </span><span class="s0">new <a href="../view/BFF.java.html">BFF</a></span><span class="s1">()</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.allParty = </span><span class="s0">new </span><span class="s1">HashMap&lt;&gt;()</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.allUsers = </span><span class="s0">new </span><span class="s1">HashMap&lt;&gt;()</span><span class="s0">;</span>
+        <span class="s0">this</span><span class="s1">.currentParty = </span><span class="s0">null;</span>
+        <span class="s1">readData()</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s4">//reading data from the fileProcessor</span>
+    <span class="s0">private void </span><span class="s1">readData() {</span>
+        <span class="s1">List&lt;User_Party&gt; userData = <a href="../controller/setup/FileProcessor.java.html">FileProcessor</a>.readFile_all().get(</span><span class="s5">&quot;User&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">for</span><span class="s1">(<a href="../model/party/User_Party.java.html">User_Party</a> u:userData) {</span>
+            <span class="s1">String username = ((<a href="../model/people/User.java.html">User</a>) u).getName()</span><span class="s0">;</span>
+            <span class="s0">if </span><span class="s1">(u </span><span class="s0">instanceof <a href="../model/people/Host.java.html">Host</a></span><span class="s1">) {</span>
+                <span class="s1">allUsers.put(username</span><span class="s0">, </span><span class="s1">(<a href="../model/people/Host.java.html">Host</a>) u)</span><span class="s0">;</span>
+            <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+                <span class="s1">allUsers.put(username</span><span class="s0">, </span><span class="s1">(<a href="../model/people/Guest.java.html">Guest</a>) u)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span>
+        <span class="s1">List&lt;User_Party&gt; partyData = <a href="../controller/setup/FileProcessor.java.html">FileProcessor</a>.readFile_all().get(</span><span class="s5">&quot;Party&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">helper.print(partyData.size())</span><span class="s0">;</span>
+        <span class="s0">for</span><span class="s1">(<a href="../model/party/User_Party.java.html">User_Party</a> p:partyData){</span>
+            <span class="s0">if </span><span class="s1">(p </span><span class="s0">instanceof <a href="../model/party/Event.java.html">Event</a></span><span class="s1">){</span>
+                <a href="../model/people/User.java.html">User</a> <span class="s1">host = ((<a href="../model/party/Event.java.html">Event</a>) p).getHost()</span><span class="s0">;</span>
+                <span class="s0">if </span><span class="s1">(allParty.containsKey(host)){</span>
+                    <span class="s1">allParty.get(host).add((<a href="../model/party/Event.java.html">Event</a>) p)</span><span class="s0">;</span>
+                <span class="s1">}</span><span class="s0">else</span><span class="s1">{</span>
+                    <span class="s1">List&lt;Event&gt; party_one_host = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">;</span>
+                    <span class="s1">party_one_host.add((<a href="../model/party/Event.java.html">Event</a>) p)</span><span class="s0">;</span>
+                    <span class="s1">allParty.put(host</span><span class="s0">, </span><span class="s1">party_one_host)</span><span class="s0">;</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span>
+        <span class="s4">//fulfillPendingGuests();</span>
+    <span class="s1">}</span>
+
+    <span class="s4">/* 
+    //fill out the list of pending guests for hosts 
+    private void fulfillPendingGuests() { 
+        for(User u: allUsers.values()){ 
+            if (u instanceof Host){ 
+                List&lt;Event&gt; partyHosting = ((Host) u).getPartyHosting(); 
+                for(Event e:partyHosting){ 
+                    for(User guest:e.getGuestList()){ 
+                        ((Host) u).getPendingGuests().put(guest, e); 
+                    } 
+                } 
+            } 
+        } 
+    } 
+ 
+     */</span>
+
+    <span class="s4">//run the system and asks what users want to do</span>
+    <span class="s0">public void </span><span class="s1">run() {</span>
+        <span class="s0">boolean </span><span class="s1">quit = </span><span class="s0">false;</span>
+        <span class="s0">while </span><span class="s1">(!quit) {</span>
+            <span class="s1">System.out.println(<a href="EviteMenu.java.html">EviteMenu</a>.getMenu())</span><span class="s0">;</span>
+            <span class="s0">int </span><span class="s1">num = helper.inputInt(</span><span class="s5">&quot;What would you like to do(Enter a number)?&quot;</span><span class="s0">, </span><span class="s6">0</span><span class="s0">, <a href="EviteMenu.java.html">EviteMenu</a></span><span class="s1">.values().length-</span><span class="s6">1</span><span class="s1">)</span><span class="s0">;</span>
+            <a href="EviteMenu.java.html">EviteMenu</a> <span class="s1">option = <a href="EviteMenu.java.html">EviteMenu</a>.values()[num]</span><span class="s0">;</span>
+            <span class="s0">switch </span><span class="s1">(option) {</span>
+                <span class="s0">case </span><span class="s1">LOGIN_CREATE: login_creat()</span><span class="s0">;break;</span>
+                <span class="s0">case </span><span class="s1">LOG_OUT: log_out()</span><span class="s0">;break;</span>
+                <span class="s0">case </span><span class="s1">PLAN_EDIT_A_PARTY: plan_edit_party()</span><span class="s0">;break;</span>
+                <span class="s0">case </span><span class="s1">RESERVE_A_PARTY: reserve()</span><span class="s0">;break;</span>
+                <span class="s0">case </span><span class="s1">INVITE_GUEST: invite_guest()</span><span class="s0">;break;</span>
+                <span class="s4">//case ACCPET_INVITATIONS: accept_invitations();break;</span>
+                <span class="s4">//case VIEW_EDIT_PARTY: view_edit();break;   combine this to  PLAN_A_PARTY</span>
+                <span class="s4">// case INVITATIONS_RESERVATIONS: invitations_reservations     split this into two parts</span>
+                <span class="s4">//case INVITATIONS_INVITED: invitations_invited();break;</span>
+                <span class="s0">case </span><span class="s1">CHECK_PARTIES_PLANNED_GO: check_parties_going()</span><span class="s0">;break;</span>
+                <span class="s0">case </span><span class="s1">VIEW_ALL_PARTIES: view_all_parties()</span><span class="s0">;break;</span>
+                <span class="s0">case </span><span class="s1">CHECK_ACCEPT_RESERVATIONS: check_accept_reservations()</span><span class="s0">;break;</span>
+                <span class="s0">case </span><span class="s1">UPGRADE: upgrade()</span><span class="s0">;break;</span>
+                <span class="s0">case </span><span class="s1">EDIT_USER: edit_user()</span><span class="s0">; break;</span>
+                <span class="s0">case </span><span class="s1">SAVE_DATA: save_data()</span><span class="s0">; break;</span>
+                <span class="s0">case </span><span class="s1">QUIT: quit = </span><span class="s0">true;break;</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span>
+        <span class="s1">System.out.println(</span><span class="s5">&quot;Hope to see you again!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">private void </span><span class="s1">check_parties_going() {</span>
+        <span class="s0">if</span><span class="s1">((currentUser != </span><span class="s0">null</span><span class="s1">) &amp;&amp; (currentUser </span><span class="s0">instanceof <a href="../model/people/Guest.java.html">Guest</a></span><span class="s1">)){</span>
+           <span class="s0">for</span><span class="s1">(var pair:((<a href="../model/people/Guest.java.html">Guest</a>) currentUser).getPartyPlanned().entrySet()) {</span>
+               <a href="../model/people/User.java.html">User</a> <span class="s1">host = pair.getKey()</span><span class="s0">;</span>
+               <a href="../model/party/Event.java.html">Event</a> <span class="s1">party = pair.getValue()</span><span class="s0">;</span>
+               <span class="s1">helper.print(party.getName() + </span><span class="s5">&quot; hosted by &quot; </span><span class="s1">+ host.getName())</span><span class="s0">;</span>
+           <span class="s1">}</span>
+        <span class="s1">}</span><span class="s0">else</span><span class="s1">{</span>
+            <span class="s1">helper.print(</span><span class="s5">&quot;Please log in to proceed!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">}</span>
+
+
+    <span class="s1">}</span>
+
+
+    <span class="s0">private void </span><span class="s1">invite_guest() {</span>
+        <span class="s0">if</span><span class="s1">((currentUser != </span><span class="s0">null</span><span class="s1">) &amp;&amp; (currentUser </span><span class="s0">instanceof <a href="../model/people/Host.java.html">Host</a></span><span class="s1">)){</span>
+            <span class="s0">boolean </span><span class="s1">find = </span><span class="s0">false;</span>
+            <span class="s1">helper.print(</span><span class="s5">&quot;Here is a list of parties you are hosting&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s0">for</span><span class="s1">(<a href="../model/party/Event.java.html">Event</a> party:((<a href="../model/people/Host.java.html">Host</a>) currentUser).getPartyHosting()){</span>
+                <span class="s1">helper.print(party)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+            <span class="s1">String party_name = helper.input(</span><span class="s5">&quot;Which party do you want to invite guest for?(Please enter the name of the party, which is sensitive)&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">String guest_name = helper.input(</span><span class="s5">&quot;Who do you want to invite?(Please enter the name of the guest, which is sensitive)&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s0">for</span><span class="s1">(<a href="../model/party/Event.java.html">Event</a> party:((<a href="../model/people/Host.java.html">Host</a>) currentUser).getPartyHosting()){</span>
+                <span class="s0">if</span><span class="s1">(party.getName().equals(party_name)){</span>
+                    <span class="s0">for</span><span class="s1">(<a href="../model/people/User.java.html">User</a> guest: allUsers.values()){</span>
+                        <span class="s0">if</span><span class="s1">(guest.getName().equals(guest_name)){</span>
+                            <span class="s1">party.getGuestList().add(guest)</span><span class="s0">;</span>
+                            <span class="s1">((<a href="../model/people/Guest.java.html">Guest</a>)guest).getPartyPlanned().put(currentUser</span><span class="s0">,</span><span class="s1">party)</span><span class="s0">;</span>
+                            <span class="s1">find = </span><span class="s0">true;</span>
+
+                        <span class="s1">}</span>
+                    <span class="s1">}</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+            <span class="s0">if</span><span class="s1">(!find){</span>
+                <span class="s1">helper.print(</span><span class="s5">&quot;Sorry, we did not find the party or the guest in our system, Please try again.&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span><span class="s0">else</span><span class="s1">{</span>
+            <span class="s1">helper.print(</span><span class="s5">&quot;Please either log in or upgrade to host account!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+    <span class="s4">//save all User data to userFile, save all Party data to partyFile</span>
+    <span class="s0">private void </span><span class="s1">save_data() {</span>
+        <span class="s1">List&lt;Event&gt; parties = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">;</span>
+        <span class="s0">for</span><span class="s1">(var pair: allParty.entrySet()){</span>
+            <span class="s0">for</span><span class="s1">(<a href="../model/party/Event.java.html">Event</a> e: pair.getValue()){</span>
+                <span class="s1">parties.add(e)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+            <span class="s1">System.out.println(pair.getValue())</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <a href="../controller/setup/FileProcessor.java.html">FileProcessor</a><span class="s1">.writePartyToFile(</span><span class="s5">&quot;TwylaPartyData&quot;</span><span class="s0">, </span><span class="s1">parties)</span><span class="s0">;</span>
+
+        <span class="s1">List&lt;User&gt; users = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">;</span>
+        <span class="s0">for</span><span class="s1">(var pair: allUsers.entrySet()){</span>
+            <span class="s1">users.add(pair.getValue())</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <a href="../controller/setup/FileProcessor.java.html">FileProcessor</a><span class="s1">.writeUserToFile(</span><span class="s5">&quot;TwylaUserData&quot;</span><span class="s0">, </span><span class="s1">users)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+    <span class="s4">//let user decide if they want to check the reservations sent to guests or reservations received</span>
+    <span class="s0">private void </span><span class="s1">check_accept_reservations() {</span>
+        <span class="s0">if </span><span class="s1">(currentUser != </span><span class="s0">null</span><span class="s1">) {</span>
+            <span class="s0">boolean </span><span class="s1">sent = helper.inputBoolean(</span><span class="s5">&quot;Do you want to check the reservations sent to hosts?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s0">if </span><span class="s1">(sent) {</span>
+                <span class="s1">reservations_sent()</span><span class="s0">;</span>
+            <span class="s1">}</span>
+            <span class="s0">boolean </span><span class="s1">received = helper.inputBoolean(</span><span class="s5">&quot;Do you want to check the reservations received from other users?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+             <span class="s0">if </span><span class="s1">(received) {     </span><span class="s4">//check the reservations received and decide if want to accept</span>
+                <span class="s0">if  </span><span class="s1">(currentUser </span><span class="s0">instanceof <a href="../model/people/Host.java.html">Host</a></span><span class="s1">){</span>
+                    <span class="s1">((<a href="../model/people/Host.java.html">Host</a>) currentUser).reservations_received()</span><span class="s0">;</span>
+                    <span class="s1">accept_reservations()</span><span class="s0">;</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span><span class="s0">else</span><span class="s1">{helper.print(</span><span class="s5">&quot;Please log in your account to proceed!&quot;</span><span class="s1">)</span><span class="s0">;</span><span class="s1">}</span>
+    <span class="s1">}</span>
+
+
+    <span class="s4">//accept the reservation from other guests</span>
+    <span class="s0">private void </span><span class="s1">accept_reservations(){</span>
+        <span class="s0">boolean </span><span class="s1">add = </span><span class="s0">false;</span>
+        <span class="s0">boolean </span><span class="s1">find = </span><span class="s0">false;</span>
+        <span class="s0">while</span><span class="s1">(add){</span>
+            <span class="s1">String accept_guest = helper.input(</span><span class="s5">&quot;Which guest do you want to accept? (Please enter the name of the guest. It is case sensitive)&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s4">// accept the reservation of a guest by removing the guest from needApprovalGuests and add the guest to the party guestMap</span>
+            <span class="s1">Map&lt;User</span><span class="s0">, </span><span class="s1">Event&gt; need_approval = ((<a href="../model/people/Host.java.html">Host</a>) currentUser).getNeedApprovalGuests()</span><span class="s0">;</span>
+            <span class="s0">for</span><span class="s1">(var pair:need_approval.entrySet()){</span>
+                <span class="s0">if</span><span class="s1">(pair.getKey().getName().equals(accept_guest)){</span>
+                    <span class="s1">find = </span><span class="s0">true;</span>
+                    <a href="../model/people/User.java.html">User</a> <span class="s1">guest = pair.getKey()</span><span class="s0">;</span>
+                    <a href="../model/party/Event.java.html">Event</a> <span class="s1">party_want = need_approval.get(guest)</span><span class="s0">;</span>
+                    <span class="s1">party_want.getGuestList().add(guest)</span><span class="s0">;   </span><span class="s4">//add the guest</span>
+                    <span class="s1">need_approval.remove(guest)</span><span class="s0">;  </span><span class="s4">//remove the user from need approval map</span>
+                    <span class="s1">add = helper.inputBoolean(</span><span class="s5">&quot;Do you want to continue accepting more reservations from guests?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+            <span class="s0">if</span><span class="s1">(!find){</span>
+                <span class="s1">helper.print(</span><span class="s5">&quot;Sorry, we can not find the guest in our system. Please try again!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+<span class="s4">/* 
+    //let user decide if they want to check the invitations sent to guests or invitations received 
+    private void invitations_invited() { 
+        if (currentUser != null) { 
+            boolean invitations_sent = helper.inputBoolean(&quot;Do you want to check the invitations sent to guests?&quot;); 
+            if (invitations_sent) { 
+                if (currentUser instanceof Host) { 
+                    ((Host) currentUser).check_pending(); 
+                } 
+            } 
+            boolean invited = helper.inputBoolean(&quot;Do you want to check the invitations received?&quot;); 
+            if (invited) { 
+                if  (currentUser instanceof Guest){ 
+                    ((Guest) currentUser).check_invitations(); 
+                } 
+            } 
+        }else{ 
+            helper.print(&quot;Please log in your account to proceed!&quot;); 
+        } 
+    } 
+ 
+ */</span>
+
+<span class="s4">/* 
+    //see the invitations received, and accept the invitation 
+    private void accept_invitations() { 
+        if (currentUser != null) { 
+            if ((currentUser instanceof Host) || (currentUser instanceof Guest)){ 
+                ((Guest) currentUser).check_invitations(); 
+                Map&lt;User,Event&gt; invited =  ((Guest) currentUser).getInvited(); 
+                //the user accepts the invitation 
+                String host_name = helper.input(&quot;Which invitation do you want to accept? (Please enter the name of the host. It is case sensitive)&quot;); 
+                boolean find = false; 
+                for(var pair: invited.entrySet()) { 
+                    User host = pair.getKey(); 
+                    Event party = pair.getValue(); 
+                    String target_name = host.getName(); 
+                    if (target_name.equals(host_name)){ 
+                        find = true; 
+                        //add the party to the reservation and remove the party from invited 
+                        ((Guest) currentUser).acceptInvitation(party); 
+                        // remove the user from the pendingGuests and add him or her to the party's guestList 
+                        if (host instanceof Host){ 
+                            ((Host) host).getPendingGuests().remove(currentUser); 
+                        } 
+                        party.getGuestList().add(currentUser); 
+                        helper.print(&quot;Congradulations! You are good to go! Be prepared for your party &quot; + party.getName()); 
+ 
+                    } 
+                } 
+                if(!find){ 
+                    helper.print(&quot;The name you entered is not found in our system. Please try again!&quot;); 
+                } 
+            } 
+        }else{helper.print(&quot;Please log in your account to proceed!&quot;);} 
+    } 
+ 
+ */</span>
+
+
+    <span class="s4">//edit the user account information</span>
+    <span class="s0">private void </span><span class="s1">edit_user() {</span>
+        <span class="s0">if </span><span class="s1">(currentUser != </span><span class="s0">null</span><span class="s1">) {</span>
+            <span class="s1">String change = helper.inputWord(</span><span class="s5">&quot;Which information do you want to edit?(name, password, email)&quot;</span><span class="s0">, </span><span class="s5">&quot;name&quot;</span><span class="s0">, </span><span class="s5">&quot;email&quot;</span><span class="s0">, </span><span class="s5">&quot;password&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s0">if </span><span class="s1">(change.equalsIgnoreCase(</span><span class="s5">&quot;name&quot;</span><span class="s1">)) {    </span><span class="s4">//change name</span>
+                <span class="s1">String name = helper.input(</span><span class="s5">&quot;What is your new name?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">currentUser.setPassword(name)</span><span class="s0">;</span>
+
+            <span class="s1">} </span><span class="s0">else if </span><span class="s1">(change.equalsIgnoreCase(</span><span class="s5">&quot;email&quot;</span><span class="s1">)) {  </span><span class="s4">//change email</span>
+                <span class="s1">String email = helper.input(</span><span class="s5">&quot;What is your new email?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">currentUser.setPassword(email)</span><span class="s0">;</span>
+
+            <span class="s1">} </span><span class="s0">else </span><span class="s1">{      </span><span class="s4">//change password</span>
+                <span class="s1">String password = helper.input(</span><span class="s5">&quot;What is your new password?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">currentUser.setPassword(password)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span><span class="s0">else</span><span class="s1">{</span>
+            <span class="s1">helper.print(</span><span class="s5">&quot;Please log in your account to proceed!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+
+
+    <span class="s4">//check the reservations that needs approval from the host</span>
+    <span class="s0">private void </span><span class="s1">reservations_sent() {</span>
+            <span class="s1">List&lt;Event&gt; can_go = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">;</span>
+            <span class="s1">List&lt;Event&gt; pending = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">;</span>
+            <span class="s0">if </span><span class="s1">((currentUser </span><span class="s0">instanceof <a href="../model/people/Host.java.html">Host</a></span><span class="s1">) || (currentUser </span><span class="s0">instanceof <a href="../model/people/Guest.java.html">Guest</a></span><span class="s1">)){</span>
+                <span class="s1">Map&lt;User</span><span class="s0">, </span><span class="s1">Event&gt; reservation = ((<a href="../model/people/Guest.java.html">Guest</a>) currentUser).getReservation()</span><span class="s0">;</span>
+                <span class="s0">for</span><span class="s1">(var pair: reservation.entrySet()){</span>
+                    <a href="../model/people/User.java.html">User</a> <span class="s1">host = pair.getKey()</span><span class="s0">;</span>
+                    <a href="../model/party/Event.java.html">Event</a> <span class="s1">party = pair.getValue()</span><span class="s0">;</span>
+                    <span class="s0">if </span><span class="s1">(party.isOpen()){   </span><span class="s4">//the party is open to everyone</span>
+                        <span class="s1">can_go.add(party)</span><span class="s0">;</span>
+                    <span class="s1">}</span><span class="s0">else</span><span class="s1">{     </span><span class="s4">//the party is not open</span>
+                        <span class="s1">List&lt;User&gt; guests = party.getGuestList()</span><span class="s0">;</span>
+                        <span class="s0">for</span><span class="s1">(<a href="../model/people/User.java.html">User</a> u: guests){   </span><span class="s4">//check if the user is in the guestList, if not, the host has not approved the reservation yet</span>
+                            <span class="s0">if </span><span class="s1">(u.equals(currentUser)){can_go.add(party)</span><span class="s0">;</span>
+                            <span class="s1">}</span><span class="s0">else</span><span class="s1">{pending.add(party)</span><span class="s0">;</span><span class="s1">}}}</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+            <span class="s1">helper.print(</span><span class="s5">&quot;Here is a list of parties that you successfully reserved!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s0">for</span><span class="s1">(<a href="../model/party/Event.java.html">Event</a> e: can_go){helper.print(</span><span class="s5">&quot;  &quot;</span><span class="s1">+ e)</span><span class="s0">;</span><span class="s1">}</span>
+
+            <span class="s1">helper.print(</span><span class="s5">&quot;Here is a list of parties that are still waiting the host to approve&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s0">for</span><span class="s1">(<a href="../model/party/Event.java.html">Event</a> e: can_go){helper.print(</span><span class="s5">&quot;  &quot;</span><span class="s1">+ e)</span><span class="s0">;</span><span class="s1">}</span>
+    <span class="s1">}</span>
+
+
+
+    <span class="s4">//upgrade from a guest account to host account, requires log in</span>
+    <span class="s0">private void </span><span class="s1">upgrade() {</span>
+        <span class="s0">if </span><span class="s1">(currentUser != </span><span class="s0">null</span><span class="s1">){     </span><span class="s4">//already logged in</span>
+            <span class="s0">if </span><span class="s1">(currentUser </span><span class="s0">instanceof <a href="../model/people/Host.java.html">Host</a></span><span class="s1">){</span>
+                <span class="s1">helper.print(</span><span class="s5">&quot;Your account is currently upgraded. You do not need to upgrade!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">}</span><span class="s0">else</span><span class="s1">{</span>
+                <span class="s0">boolean </span><span class="s1">pay = helper.inputBoolean(</span><span class="s5">&quot;Would you like to pay 25 dollars to upgrade to host account?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s0">if</span><span class="s1">(pay){   </span><span class="s4">//upgrade</span>
+                    <span class="s1">String name = currentUser.getName()</span><span class="s0">;</span>
+                    <span class="s1">String email = currentUser.getEmail()</span><span class="s0">;</span>
+                    <span class="s1">String password = currentUser.getPassword()</span><span class="s0">;</span>
+                    <a href="../model/people/Host.java.html">Host</a> <span class="s1">host = </span><span class="s0">new <a href="../model/people/Host.java.html">Host</a></span><span class="s1">(name</span><span class="s0">, </span><span class="s1">email</span><span class="s0">, </span><span class="s1">password)</span><span class="s0">;</span>
+                    <span class="s1">currentUser = host</span><span class="s0">;</span>
+                    <span class="s1">allUsers.replace(name</span><span class="s0">, </span><span class="s1">allUsers.get(name)</span><span class="s0">, </span><span class="s1">host)</span><span class="s0">;     </span><span class="s4">//upgrade in the all user map</span>
+                    <span class="s1">helper.print(</span><span class="s5">&quot;You have successfully upgraded to the Premium. Now you can host parties and invite your friends!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+
+        <span class="s1">}</span><span class="s0">else</span><span class="s1">{    </span><span class="s4">//not logged in</span>
+            <span class="s1">helper.print(</span><span class="s5">&quot;Please log in your account to upgrade!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+
+    <span class="s1">}</span>
+
+
+    <span class="s4">//private void invitations_reservations() {}</span>
+
+
+
+    <span class="s4">//display all parties in the system</span>
+    <span class="s0">private void </span><span class="s1">view_all_parties() {</span>
+        <span class="s1">helper.print(</span><span class="s5">&quot;Here is the list of all parties&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">for</span><span class="s1">(var pair: allParty.entrySet()){</span>
+            <span class="s0">for</span><span class="s1">(<a href="../model/party/Event.java.html">Event</a> party:  pair.getValue()){</span>
+                <span class="s1">String party_name = party.getName()</span><span class="s0">;</span>
+                <span class="s1">String host_name = pair.getKey().getName()</span><span class="s0">;</span>
+                <span class="s1">helper.print(party_name + </span><span class="s5">&quot; Hosted by &quot; </span><span class="s1">+ host_name)</span><span class="s0">;</span>
+
+            <span class="s1">}</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+
+<span class="s4">//let the host view and choose the party they are hosting and want to edit</span>
+<span class="s4">// it requires the user to be a host and log in</span>
+    <span class="s0">private boolean </span><span class="s1">view_edit() {</span>
+        <span class="s0">boolean </span><span class="s1">find = </span><span class="s0">false;</span>
+        <span class="s0">if </span><span class="s1">(currentUser != </span><span class="s0">null </span><span class="s1">&amp;&amp; currentUser </span><span class="s0">instanceof <a href="../model/people/Host.java.html">Host</a></span><span class="s1">) {   </span><span class="s4">//requires log in and being a host</span>
+            <span class="s4">//display the parties hosting</span>
+            <span class="s1">List&lt;Event&gt; partyHosting = ((<a href="../model/people/Host.java.html">Host</a>) currentUser).getPartyHosting()</span><span class="s0">;</span>
+            <span class="s0">for </span><span class="s1">(<a href="../model/party/Event.java.html">Event</a> e : partyHosting) {</span>
+                <span class="s1">helper.print(e)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+            <span class="s1">String want_edit = helper.input(</span><span class="s5">&quot;Please enter the name of the party that you want to edit. It is case-sensitive.&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s0">for </span><span class="s1">(<a href="../model/party/Event.java.html">Event</a> e : partyHosting) {</span>
+                <span class="s0">if </span><span class="s1">(want_edit.equals(e.getName())) {  </span><span class="s4">//find the party that user wants to edit in the system</span>
+                    <span class="s1">find = </span><span class="s0">true;</span>
+                    <span class="s1">helper.print(</span><span class="s5">&quot;Here is the status of the party&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">helper.print(e.fullStatus())</span><span class="s0">;</span>
+                    <span class="s1">currentParty = e</span><span class="s0">;    </span><span class="s4">//make currentParty the party that user wants to edit</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+            <span class="s0">if </span><span class="s1">(!find){ </span><span class="s4">//can not find the party in the system</span>
+                <span class="s1">helper.print(</span><span class="s5">&quot;The party you entered does not exist in our system, please try again!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+            <span class="s1">}</span>
+        <span class="s1">}</span><span class="s0">else</span><span class="s1">{</span>
+            <span class="s1">helper.print(</span><span class="s5">&quot;You need to log in a host account to view and edit party hosting. If not, please either log in or upgrade to host account.&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+
+        <span class="s0">return </span><span class="s1">find</span><span class="s0">;</span>
+
+    <span class="s1">}</span>
+
+
+    <span class="s4">//reserve a party, requires log in.</span>
+    <span class="s4">//if it is open to everyone, if not, a request will be sent to the host, the guest needs to wait the host to approve.</span>
+    <span class="s0">private void </span><span class="s1">reserve() {</span>
+        <span class="s0">if </span><span class="s1">(currentUser != </span><span class="s0">null</span><span class="s1">) {   </span><span class="s4">//checks if the user is logged in</span>
+            <span class="s0">boolean </span><span class="s1">find = </span><span class="s0">false;</span>
+            <span class="s1">view_all_parties()</span><span class="s0">;</span>
+            <span class="s1">String party_want = helper.input(</span><span class="s5">&quot;Please enter the name of the party that you want to reserve. It is case-sensitive.&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s0">for </span><span class="s1">(var pair : allParty.entrySet()) {</span>
+                <a href="../model/people/User.java.html">User</a> <span class="s1">host = pair.getKey()</span><span class="s0">;</span>
+                <span class="s0">for</span><span class="s1">(<a href="../model/party/Event.java.html">Event</a> party: pair.getValue()){       </span><span class="s4">//Event party = pair.getValue();</span>
+                    <span class="s0">if </span><span class="s1">(party_want.equals(party.getName())) {   </span><span class="s4">//find the party_want in the system</span>
+                        <span class="s1">find = </span><span class="s0">true;</span>
+                        <span class="s0">if </span><span class="s1">(currentUser </span><span class="s0">instanceof <a href="../model/people/Guest.java.html">Guest</a></span><span class="s1">) {</span>
+                            <span class="s1">((<a href="../model/people/Guest.java.html">Guest</a>) currentUser).getReservation().put(host</span><span class="s0">, </span><span class="s1">party)</span><span class="s0">;    </span><span class="s4">//add the party to user's reservation map</span>
+                        <span class="s1">}</span>
+                        <span class="s0">if </span><span class="s1">(party.isOpen()) {   </span><span class="s4">//if the party is open to everyone, the guest can directly reserve</span>
+                            <span class="s1">party.getGuestList().add(currentUser)</span><span class="s0">;       </span><span class="s4">//add the user to the guestList</span>
+                            <span class="s1">helper.print(</span><span class="s5">&quot;Congrats! You successfully reserved the party: &quot; </span><span class="s1">+ party.getName() + </span><span class="s5">&quot;. Looking forward to see you there!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                        <span class="s1">} </span><span class="s0">else </span><span class="s1">{    </span><span class="s4">//the party is private and needs approval from host.</span>
+                            <span class="s4">//send the request to the host by putting the user and party into the needApprovalGuest map</span>
+                            <span class="s0">if </span><span class="s1">(host </span><span class="s0">instanceof <a href="../model/people/Host.java.html">Host</a></span><span class="s1">) {</span>
+                                <span class="s1">((<a href="../model/people/Host.java.html">Host</a>) host).addNeedApprovalGuests(currentUser</span><span class="s0">,</span><span class="s1">party)</span><span class="s0">;</span>
+                                <span class="s1">helper.print(</span><span class="s5">&quot;Guest need to be approved &quot;</span><span class="s1">)</span><span class="s0">;</span>
+                                <span class="s1">helper.print(((<a href="../model/people/Host.java.html">Host</a>) host).getNeedApprovalGuests())</span><span class="s0">;</span>
+                                <span class="s1">helper.print(</span><span class="s5">&quot;Host &quot; </span><span class="s1">+ host)</span><span class="s0">;</span>
+                            <span class="s1">}</span>
+                            <span class="s1">helper.print(</span><span class="s5">&quot;This event is private! Please wait for the host &quot; </span><span class="s1">+ host.getName() + </span><span class="s5">&quot; to approve your reservation!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                        <span class="s1">}</span>
+                    <span class="s1">}</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+            <span class="s0">if </span><span class="s1">(!find){</span><span class="s4">//can not find the party in the system</span>
+                <span class="s1">helper.print(</span><span class="s5">&quot;The party you entered does not exist in our system, please try again!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span><span class="s0">else</span><span class="s1">{</span>
+            <span class="s1">helper.print(</span><span class="s5">&quot;Please log in to reserve a party!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+
+    <span class="s4">//plan a party, requires the account that is logged in is host account, otherwise need to upgrade.</span>
+    <span class="s0">private void </span><span class="s1">plan_edit_party() {</span>
+        <span class="s0">if </span><span class="s1">((currentUser </span><span class="s0">instanceof <a href="../model/people/Host.java.html">Host</a></span><span class="s1">) &amp;&amp; (currentUser != </span><span class="s0">null</span><span class="s1">)) {   </span><span class="s4">//make sure that the User is logged in and a host. Guest can not plan a party</span>
+            <span class="s4">//aks if the user want to continue edit existing party or create new party</span>
+            <span class="s0">boolean </span><span class="s1">edit = helper.inputBoolean(</span><span class="s5">&quot;Do you want to continue edit an existing party?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s0">boolean </span><span class="s1">find = </span><span class="s0">false;</span>
+            <span class="s0">if </span><span class="s1">(edit) {    </span><span class="s4">//want to edit existing party</span>
+                <span class="s1">find = view_edit()</span><span class="s0">;</span>
+            <span class="s1">}</span><span class="s0">else</span><span class="s1">{find = </span><span class="s0">true;</span><span class="s1">}</span>
+            <span class="s0">if </span><span class="s1">(find) {</span>
+                <span class="s0">boolean </span><span class="s1">quit = </span><span class="s0">false;</span>
+                <span class="s0">while </span><span class="s1">(!quit) {    </span><span class="s4">//ask which party the user wants to create</span>
+                    <span class="s1">helper.print(<a href="../model/party/EventType.java.html">EventType</a>.getType())</span><span class="s0">;</span>
+                    <span class="s0">int </span><span class="s1">option = helper.inputInt(</span><span class="s5">&quot;What is the type of party that you want to plan or edit(Enter a number)?&quot;</span><span class="s0">, </span><span class="s6">0</span><span class="s0">, <a href="../model/party/EventType.java.html">EventType</a></span><span class="s1">.values().length - </span><span class="s6">1</span><span class="s1">)</span><span class="s0">;</span>
+                    <a href="../model/party/EventType.java.html">EventType</a> <span class="s1">chosen_event = <a href="../model/party/EventType.java.html">EventType</a>.values()[option]</span><span class="s0">;</span>
+                    <span class="s0">switch </span><span class="s1">(chosen_event) {</span>
+                        <span class="s0">case </span><span class="s1">BIRTHDAY: birthday(edit)</span><span class="s0">;</span>
+                            <span class="s0">break;</span>
+                        <span class="s0">case </span><span class="s1">ANNIVERSARY: anniversary(edit)</span><span class="s0">;</span>
+                            <span class="s0">break;</span>
+                        <span class="s0">case </span><span class="s1">GRADUATION: graduation(edit)</span><span class="s0">;</span>
+                            <span class="s0">break;</span>
+                        <span class="s0">case </span><span class="s1">WEDDING: wedding(edit)</span><span class="s0">;</span>
+                            <span class="s0">break;</span>
+                        <span class="s0">case </span><span class="s1">GIFT_EXCHANGE: gift_exchange(edit)</span><span class="s0">;</span>
+                            <span class="s0">break;</span>
+                        <span class="s0">case </span><span class="s1">QUIT: quit = </span><span class="s0">true;</span>
+                            <span class="s0">break;</span>
+                    <span class="s1">}</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span><span class="s0">else</span><span class="s1">{helper.print(</span><span class="s5">&quot;Your account is not a host account. You can't plan a party. Please upgrade to host account!&quot;</span><span class="s1">)</span><span class="s0">;</span><span class="s1">}</span>
+
+    <span class="s1">}</span>
+
+
+    <span class="s4">//continue to create the party by setting more details and updating the system after the party is created</span>
+    <span class="s0">private void </span><span class="s1">continue_create(</span><span class="s0">boolean </span><span class="s1">edit) {</span>
+        <span class="s1">party_steps()</span><span class="s0">;</span>
+        <span class="s0">if </span><span class="s1">(!edit) {</span>
+            <span class="s4">//add the party to the database</span>
+            <span class="s0">if </span><span class="s1">(allParty.containsKey(currentUser)) {</span>
+                <span class="s1">allParty.get(currentUser).add(currentParty)</span><span class="s0">;</span>
+            <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+                <span class="s1">List&lt;Event&gt; party_one_host = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">;</span>
+                <span class="s1">party_one_host.add(currentParty)</span><span class="s0">;</span>
+                <span class="s1">allParty.put(currentUser</span><span class="s0">, </span><span class="s1">party_one_host)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+            <span class="s0">if </span><span class="s1">(currentUser </span><span class="s0">instanceof <a href="../model/people/Host.java.html">Host</a></span><span class="s1">) {</span>
+                <span class="s1">((<a href="../model/people/Host.java.html">Host</a>) currentUser).getPartyHosting().add(currentParty)</span><span class="s0">;     </span><span class="s4">//add the party to the list of parties that the user is hosting</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+    <span class="s4">//uses the methods implemented in the fancy interface</span>
+    <span class="s0">private void </span><span class="s1">fancy(<a href="../model/party/Event.java.html">Event</a> event) {</span>
+        <span class="s0">boolean </span><span class="s1">photographer = helper.inputBoolean(</span><span class="s5">&quot;Would you like to hire photographers for you party?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">boolean </span><span class="s1">champagneFountain = helper.inputBoolean(</span><span class="s5">&quot;Would you like to have Champagne Fountain for your party?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">if </span><span class="s1">(event </span><span class="s0">instanceof <a href="../model/party/Wedding.java.html">Wedding</a></span><span class="s1">){</span>
+            <span class="s1">((<a href="../model/party/Wedding.java.html">Wedding</a>) event).champagneFountain(champagneFountain)</span><span class="s0">;</span>
+            <span class="s1">((<a href="../model/party/Wedding.java.html">Wedding</a>) event).hirePhotographer(photographer)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">if </span><span class="s1">(event </span><span class="s0">instanceof <a href="../model/party/Anniversary.java.html">Anniversary</a></span><span class="s1">){</span>
+            <span class="s1">((<a href="../model/party/Anniversary.java.html">Anniversary</a>) event).champagneFountain(champagneFountain)</span><span class="s0">;</span>
+            <span class="s1">((<a href="../model/party/Anniversary.java.html">Anniversary</a>) event).hirePhotographer(photographer)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+
+    <span class="s1">}</span>
+
+    <span class="s4">//create the wedding object based on User's choice, ask about registry, then call continue_create to add more details</span>
+    <span class="s0">private void </span><span class="s1">wedding(</span><span class="s0">boolean </span><span class="s1">edit) {</span>
+        <span class="s0">if </span><span class="s1">(!edit) {   </span><span class="s4">//the user wants to create a new party</span>
+            <a href="../model/party/Wedding.java.html">Wedding</a> <span class="s1">event = </span><span class="s0">new <a href="../model/party/Wedding.java.html">Wedding</a></span><span class="s1">()</span><span class="s0">;</span>
+            <span class="s1">currentParty = event</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">if </span><span class="s1">(currentParty </span><span class="s0">instanceof <a href="../model/party/Wedding.java.html">Wedding</a></span><span class="s1">) {</span>
+            <span class="s0">boolean </span><span class="s1">add = </span><span class="s0">true;</span>
+            <span class="s1">List&lt;String&gt; registry_planning = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;()</span><span class="s0">;</span>
+            <span class="s0">while </span><span class="s1">(add) {</span>
+                <span class="s1">String item = helper.input(</span><span class="s5">&quot;What is the registry item that you want to provide to the guests?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">registry_planning.add(item)</span><span class="s0">;</span>
+                <span class="s1">helper.print(</span><span class="s5">&quot;Here is the registry list.&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s0">for </span><span class="s1">(String s : registry_planning) {</span>
+                    <span class="s1">helper.print(s)</span><span class="s0">;</span>
+                <span class="s1">}</span>
+                <span class="s1">add = helper.inputBoolean(</span><span class="s5">&quot;Do you want to continue to add more items?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">((<a href="../model/party/Wedding.java.html">Wedding</a>) currentParty).setRegistry(registry_planning)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+
+
+            <span class="s0">boolean </span><span class="s1">first_dance = helper.inputBoolean(</span><span class="s5">&quot;Do you want to prepare first dance?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s0">boolean </span><span class="s1">tossBouquet = helper.inputBoolean(</span><span class="s5">&quot;Do you plan to toss bouquet?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">((<a href="../model/party/Wedding.java.html">Wedding</a>) currentParty).setRegistry(registry_planning)</span><span class="s0">;</span>
+            <span class="s1">((<a href="../model/party/Wedding.java.html">Wedding</a>) currentParty).firstDance(first_dance)</span><span class="s0">;</span>
+            <span class="s1">((<a href="../model/party/Wedding.java.html">Wedding</a>) currentParty).tossBouquet(tossBouquet)</span><span class="s0">;</span>
+
+            <span class="s1">fancy(currentParty)</span><span class="s0">;    </span><span class="s4">//ask user if he or she wants to implement methods in Fancy interface.</span>
+            <span class="s1">continue_create(edit)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+    <span class="s4">//create the anniversary object based on User's choice, set specific details different occasion, then call continue_create to add more details</span>
+    <span class="s0">private void </span><span class="s1">anniversary(</span><span class="s0">boolean </span><span class="s1">edit) {</span>
+        <span class="s0">if </span><span class="s1">(!edit) {   </span><span class="s4">//the user wants to create a new party</span>
+            <a href="../model/party/Anniversary.java.html">Anniversary</a> <span class="s1">event = </span><span class="s0">new <a href="../model/party/Anniversary.java.html">Anniversary</a></span><span class="s1">()</span><span class="s0">;</span>
+            <span class="s1">currentParty = event</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">if </span><span class="s1">(currentParty </span><span class="s0">instanceof <a href="../model/party/Anniversary.java.html">Anniversary</a></span><span class="s1">) {</span>
+            <span class="s1">String type = helper.input(</span><span class="s5">&quot;Which type of anniversary are you planning?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s0">int </span><span class="s1">year = helper.inputInt(</span><span class="s5">&quot;Which year of anniversary are you planning?&quot;</span><span class="s0">, </span><span class="s6">0</span><span class="s0">, </span><span class="s6">100</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s0">boolean </span><span class="s1">memoryShowcase = helper.inputBoolean(</span><span class="s5">&quot;Do you plan to give memory showcase?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">((<a href="../model/party/Anniversary.java.html">Anniversary</a>) currentParty).setType(type)</span><span class="s0">;</span>
+            <span class="s1">((<a href="../model/party/Anniversary.java.html">Anniversary</a>) currentParty).setYear(year)</span><span class="s0">;</span>
+            <span class="s1">((<a href="../model/party/Anniversary.java.html">Anniversary</a>) currentParty).setShowcase(memoryShowcase)</span><span class="s0">;</span>
+            <span class="s1">fancy(currentParty)</span><span class="s0">;    </span><span class="s4">//ask user if he or she wants to implement methods in Fancy interface.</span>
+            <span class="s1">continue_create(edit)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+    <span class="s4">//create the graduation object based on User's choice, set specific details different occasion, then call continue_create to add more details</span>
+    <span class="s0">private void </span><span class="s1">graduation(</span><span class="s0">boolean </span><span class="s1">edit) {</span>
+        <span class="s0">if </span><span class="s1">(!edit) {   </span><span class="s4">//the user wants to create a new party</span>
+            <a href="../model/party/Graduation.java.html">Graduation</a> <span class="s1">event = </span><span class="s0">new <a href="../model/party/Graduation.java.html">Graduation</a></span><span class="s1">()</span><span class="s0">;</span>
+            <span class="s1">currentParty = event</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">if </span><span class="s1">(currentParty </span><span class="s0">instanceof <a href="../model/party/Graduation.java.html">Graduation</a></span><span class="s1">) {</span>
+            <span class="s1">String type = helper.input(</span><span class="s5">&quot;Which type of graduation are you planning?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">String announcement = helper.input(</span><span class="s5">&quot;Which is your graduation announcement?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">((<a href="../model/party/Graduation.java.html">Graduation</a>) currentParty).setType(type)</span><span class="s0">;</span>
+            <span class="s1">((<a href="../model/party/Graduation.java.html">Graduation</a>) currentParty).setGradAnnouncement(announcement)</span><span class="s0">;</span>
+            <span class="s1">continue_create(edit)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+
+    <span class="s4">//create the birthday object based on User's choice, set specific details different occasion, then call continue_create to add more details</span>
+    <span class="s0">private void </span><span class="s1">birthday(</span><span class="s0">boolean </span><span class="s1">edit) {</span>
+        <span class="s0">if </span><span class="s1">(!edit) {   </span><span class="s4">//the user wants to create a new party</span>
+            <a href="../model/party/Birthday.java.html">Birthday</a> <span class="s1">event = </span><span class="s0">new <a href="../model/party/Birthday.java.html">Birthday</a></span><span class="s1">()</span><span class="s0">;</span>
+            <span class="s1">currentParty = event</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">if </span><span class="s1">(currentParty </span><span class="s0">instanceof <a href="../model/party/Birthday.java.html">Birthday</a></span><span class="s1">) {</span>
+            <span class="s0">int </span><span class="s1">age = helper.inputInt(</span><span class="s5">&quot;Which year of the birthday are you planning?&quot;</span><span class="s0">, </span><span class="s6">0</span><span class="s0">, </span><span class="s6">100</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">((<a href="../model/party/Birthday.java.html">Birthday</a>) currentParty).setAge(age)</span><span class="s0">;</span>
+            <span class="s1">helper.print(((<a href="../model/party/Birthday.java.html">Birthday</a>) currentParty).prepareCake())</span><span class="s0">;</span>
+            <span class="s1">continue_create(edit)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+    <span class="s4">//create the gift_exchange object based on User's choice, set specific details different occasion, then call continue_create to add more details</span>
+    <span class="s0">private void </span><span class="s1">gift_exchange(</span><span class="s0">boolean </span><span class="s1">edit) {</span>
+        <span class="s0">if </span><span class="s1">(!edit) {   </span><span class="s4">//the user wants to create a new party</span>
+            <a href="../model/party/GiftExchange.java.html">GiftExchange</a> <span class="s1">event = </span><span class="s0">new <a href="../model/party/GiftExchange.java.html">GiftExchange</a></span><span class="s1">()</span><span class="s0">;</span>
+            <span class="s1">currentParty = event</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">if </span><span class="s1">(currentParty </span><span class="s0">instanceof <a href="../model/party/GiftExchange.java.html">GiftExchange</a></span><span class="s1">) {</span>
+            <span class="s0">int </span><span class="s1">limit = helper.inputInt(</span><span class="s5">&quot;What is the max amount of money each guest can spend on the gift?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">((<a href="../model/party/GiftExchange.java.html">GiftExchange</a>) currentParty).setLimit(limit)</span><span class="s0">;</span>
+            <span class="s1">continue_create(edit)</span><span class="s0">;</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+
+    <span class="s4">//ask the time to carry out the party</span>
+    <span class="s0">private </span><span class="s1">LocalDate ask_time() {</span>
+        <span class="s1">LocalDate today = LocalDate.now()</span><span class="s0">;</span>
+        <span class="s0">int </span><span class="s1">year = helper.inputInt(</span><span class="s5">&quot;Which year do you plan to carry out the party?&quot;</span><span class="s0">, </span><span class="s1">today.getYear()</span><span class="s0">, </span><span class="s6">2300</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">int </span><span class="s1">month = helper.inputInt(</span><span class="s5">&quot;Which month do you plan to carry out the party?&quot;</span><span class="s0">, </span><span class="s6">1</span><span class="s0">,</span><span class="s6">12</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">int </span><span class="s1">date = helper.inputInt(</span><span class="s5">&quot;Which day do you plan to carry out the party?&quot;</span><span class="s0">, </span><span class="s6">1</span><span class="s0">,</span><span class="s6">31</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">LocalDate planned_day = LocalDate.of(year</span><span class="s0">, </span><span class="s1">month</span><span class="s0">, </span><span class="s1">date)</span><span class="s0">;</span>
+    <span class="s0">return </span><span class="s1">planned_day</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+    <span class="s4">//plan the specific details about each party</span>
+    <span class="s0">private void </span><span class="s1">party_steps() {</span>
+        <span class="s4">//currentParty = event;</span>
+        <span class="s1">System.out.println(</span><span class="s5">&quot;Now, let's plan more details about your party!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">boolean </span><span class="s1">quit = </span><span class="s0">false;</span>
+        <span class="s0">while </span><span class="s1">(!quit) {</span>
+            <span class="s1">System.out.println(<a href="PartySteps.java.html">PartySteps</a>.getType())</span><span class="s0">;</span>
+            <span class="s0">int </span><span class="s1">option = helper.inputInt(</span><span class="s5">&quot;Which step do you want to start(Enter a number)?&quot;</span><span class="s0">, </span><span class="s6">0</span><span class="s0">, <a href="PartySteps.java.html">PartySteps</a></span><span class="s1">.values().length - </span><span class="s6">1</span><span class="s1">)</span><span class="s0">;</span>
+            <a href="PartySteps.java.html">PartySteps</a> <span class="s1">chosen = <a href="PartySteps.java.html">PartySteps</a>.values()[option]</span><span class="s0">;</span>
+            <span class="s0">switch </span><span class="s1">(chosen) {</span>
+                <span class="s0">case </span><span class="s1">NAME: String name = helper.input(</span><span class="s5">&quot;What the name for your party?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">currentParty.setName(name)</span><span class="s0">;break;</span>
+                <span class="s0">case </span><span class="s1">TIME: LocalDate time_party = ask_time()</span><span class="s0">;</span>
+                    <span class="s1">currentParty.setTime(time_party)</span><span class="s0">;break;</span>
+                <span class="s0">case </span><span class="s1">THEME: String theme = helper.input(</span><span class="s5">&quot;What the theme for your party?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">currentParty.setTheme(theme)</span><span class="s0">;break;</span>
+                <span class="s0">case </span><span class="s1">GUEST_LIST: Map&lt;User</span><span class="s0">, </span><span class="s1">Event&gt; guestMap = edit_guestMap()</span><span class="s0">;</span>
+                <span class="s4">/* 
+                    // Since the guests also need to approve the invitation, so they are added to the pending guests, once they accept, they will be added to the guestList. 
+                    if(currentUser instanceof Host){ 
+                        ((Host) currentUser).setPendingGuests(guestMap); 
+                    } 
+                 */</span>
+                    <span class="s0">break;</span>
+                <span class="s0">case </span><span class="s1">LOCATION: String location = helper.input(</span><span class="s5">&quot;What the location for your party?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">currentParty.setLocation(location)</span><span class="s0">;break;</span>
+                <span class="s0">case </span><span class="s1">AGE_LIMIT: </span><span class="s0">boolean </span><span class="s1">age_limit = helper.inputBoolean(</span><span class="s5">&quot;Does this party only allow guests who are above 21?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">currentParty.setAgeLimit(age_limit)</span><span class="s0">;break;</span>
+                <span class="s0">case </span><span class="s1">OPEN: </span><span class="s0">boolean </span><span class="s1">open = helper.inputBoolean(</span><span class="s5">&quot;Is this party open to everyone&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                    <span class="s1">currentParty.setOpen(open)</span><span class="s0">;break;</span>
+                <span class="s0">case </span><span class="s1">QUIT: quit = </span><span class="s0">true;break;</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+    <span class="s4">//ask user the guest that he or she wants to invite, it requires the guest is in the system or one of our Users.</span>
+    <span class="s0">private </span><span class="s1">Map&lt;User</span><span class="s0">, </span><span class="s1">Event&gt; edit_guestMap() {</span>
+        <span class="s1">Map&lt;User</span><span class="s0">, </span><span class="s1">Event&gt; guestMap = </span><span class="s0">new </span><span class="s1">HashMap&lt;&gt;()</span><span class="s0">;</span>
+        <span class="s0">boolean </span><span class="s1">invite = </span><span class="s0">true;</span>
+        <span class="s0">while</span><span class="s1">(invite){</span>
+            <span class="s1">String name = helper.input(</span><span class="s5">&quot;Which guest would you like to invite? Please enter the name of the guest.&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s0">if </span><span class="s1">(allUsers.containsKey(name)){     </span><span class="s4">//the guest is in your system, invite him or her</span>
+                <a href="../model/people/User.java.html">User</a> <span class="s1">guest = allUsers.get(name)</span><span class="s0">;</span>
+                <span class="s1">guestMap.put(guest</span><span class="s0">, </span><span class="s1">currentParty)</span><span class="s0">;      </span><span class="s4">//add the person to the guestList</span>
+                <span class="s0">if </span><span class="s1">(guest </span><span class="s0">instanceof <a href="../model/people/Guest.java.html">Guest</a></span><span class="s1">){</span>
+                    <span class="s1">((<a href="../model/people/Guest.java.html">Guest</a>) guest).getPartyPlanned().put(currentUser</span><span class="s0">, </span><span class="s1">currentParty)</span><span class="s0">;    </span><span class="s4">//add the party to guest's schedule</span>
+                <span class="s1">}</span>
+                <span class="s1">invite = helper.inputBoolean(</span><span class="s5">&quot;Would you like to continue inviting guest?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+            <span class="s1">}</span><span class="s0">else</span><span class="s1">{</span>
+                <span class="s1">helper.print(</span><span class="s5">&quot;The guest you try to invite does not exist in your system. Please try again!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">invite = </span><span class="s0">false;</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span>
+        <span class="s0">return </span><span class="s1">guestMap</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+    <span class="s4">//log out the account</span>
+    <span class="s0">private void </span><span class="s1">log_out() {</span>
+        <span class="s1">currentUser = </span><span class="s0">null;</span>
+        <span class="s1">helper.print(</span><span class="s5">&quot;You are Logged out!&quot; </span><span class="s1">)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+
+    <span class="s4">//check if the user exists in the system, if so, sign in, otherwise create a new account</span>
+    <span class="s0">private void </span><span class="s1">login_creat() {</span>
+        <span class="s1">String name = helper.input(</span><span class="s5">&quot;Please enter your name: &quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s0">if </span><span class="s1">(allUsers.containsKey(name)){      </span><span class="s4">//the user exists in the system, sign in. password is case-sensitive</span>
+            <span class="s1">String password = helper.input(</span><span class="s5">&quot;Please enter your password: &quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s0">if </span><span class="s1">((password.equals(allUsers.get(name).getPassword()))) {</span>
+                <span class="s1">currentUser = allUsers.get(name)</span><span class="s0">;</span>
+                <span class="s1">helper.print(</span><span class="s5">&quot;You are logged in!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">}</span><span class="s0">else</span><span class="s1">{</span>
+                <span class="s1">helper.print(</span><span class="s5">&quot;Your password is not correct. Please try again&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">}</span>
+        <span class="s1">}</span><span class="s0">else</span><span class="s1">{     </span><span class="s4">//the user does not exist in the system, create an account</span>
+            <span class="s0">boolean </span><span class="s1">create = helper.inputBoolean(</span><span class="s5">&quot;You do not have an account in the system. Do you want to create an account?&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s0">if</span><span class="s1">(create){</span>
+                <span class="s1">String password_create = helper.input(</span><span class="s5">&quot;Please enter your password: &quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">String email = helper.input(</span><span class="s5">&quot;Please enter your email: &quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <a href="../model/people/User.java.html">User</a> <span class="s1">user_create = </span><span class="s0">new <a href="../model/people/Guest.java.html">Guest</a></span><span class="s1">(name</span><span class="s0">,</span><span class="s1">email</span><span class="s0">,</span><span class="s1">password_create</span><span class="s0">, new </span><span class="s1">HashMap&lt;&gt;()</span><span class="s0">, new </span><span class="s1">HashMap&lt;&gt;()</span><span class="s0">, </span><span class="s5">&quot;&quot;</span><span class="s0">, new </span><span class="s1">ArrayList&lt;&gt;())</span><span class="s0">;</span>
+                <span class="s1">allUsers.put(name</span><span class="s0">, </span><span class="s1">user_create)</span><span class="s0">;    </span><span class="s4">//add the user to the userMap</span>
+                <span class="s1">currentUser = user_create</span><span class="s0">;    </span><span class="s4">//log in the user</span>
+                <span class="s1">helper.print(</span><span class="s5">&quot;Congratulations! You already created an account. You are logged in!&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+            <span class="s1">}</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public static void </span><span class="s1">main(String[] args) {</span>
+        <span class="s1">Evite haveFun = </span><span class="s0">new </span><span class="s1">Evite()</span><span class="s0">;</span>
+        <span class="s1">haveFun.run()</span><span class="s0">;</span>
+
+    <span class="s1">}</span>
+
+
+
+<span class="s1">}</span>
+</pre>
+</body>
+</html>
